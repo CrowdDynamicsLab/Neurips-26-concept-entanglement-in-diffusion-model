@@ -1,0 +1,92 @@
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2025} with \usepackage[nohyperref]{icml2025} above.
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\usepackage{neurips_2026}
+
+% For theorems and such
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{comment}
+\usepackage{amssymb}
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+\title{You Can’t Have It Both Ways:
+Concept Entanglement Limits Diffusion Model Unlearning}
+
+\newif\ifcomments
+\commentstrue        % show comments
+% \commentsfalse     % hide comments (e.g., for submission)
+
+
+\newcommand{\ali}[1]{\textcolor{olive}{[ali: #1]}}
+\newcommand{\varun}[1]{\textcolor{red}{[Varun: #1]}}
+\newcommand{\yian}[1]{\textcolor{blue}{[yian: #1]}}
+\newcommand{\hs}[1]{\textcolor{violet}{[hari: #1]}}
+\author{
+Anonymous Authors
+}
+\begin{document}
+\maketitle
+
+% You may provide any keywords that you
+% find helpful for describing your paper; these are used to populate
+% the "keywords" metadata in the PDF but will not be shown in the document
+
+
+\input{sections/00Abstract}
+\input{sections/01Introduction}
+\input{sections/02Related}
+\input{sections/03Motivation}
+\input{sections/04Proof}
+% \input{sections/04ProblemFormulation}
+% \input{sections/04Method}
+\input{sections/05Experiment}
+\input{sections/06Discussion}
+\input{sections/07Limitation}
+\newpage
+\bibliography{references}   % or whatever your .bib filename is
+\bibliographystyle{plainnat}
+\newpage
+\input{sections/08Appendix}
+\end{document}

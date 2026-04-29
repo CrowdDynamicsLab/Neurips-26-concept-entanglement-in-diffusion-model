@@ -1,0 +1,21 @@
+\section{Conclusion}
+\label{sec:conclusion}
+We show that the tension between robust concept erasure and neighbor preservation in diffusion models reflects a structural property of the underlying representation geometry, not merely a weakness of existing methods. 
+\Cref{thm:tradeoff} $\epsilon$-robust erasure of a concept necessarily incurs at least $\kappa(1-\varepsilon)/L - \delta$ collateral damage on semantic neighbors, where $\kappa$ captures geometric overlap between the target’s activation region and its neighborhood.
+Empirically, across seven unlearning methods and five target concepts spanning $\hat\kappa \in [0.27, 0.89]$, we observe (i) no method escapes the tradeoff, (ii) tradeoff severity scales monotonically with $\hat\kappa$, and (iii) operating regions stratify by mechanism type, with the most aggressive methods (STEREO, AdvUnlearn) approaching the predicted lower bound on high-$\hat\kappa$ concepts. 
+This perspective shifts concept unlearning from trying to bypass the tradeoff to designing methods that approach the theoretical limit efficiently, while suggesting $\hat\kappa$ as a practical diagnostic for selecting targets and methods under deployment constraints.
+
+
+
+\section{Discussion}
+\label{sec:discussion}
+Our results characterize concept unlearning in diffusion models as a structurally constrained optimization rather than a purely engineering problem. We discuss the implications across three threads.
+
+\paragraph{The tradeoff is unavoidable, not unsolvable.}
+\Cref{thm:tradeoff} establishes that $\epsilon$-robust erasure of a concept incurs at least $\kappa(1-\varepsilon)/L - \delta$ collateral damage on its activation neighbors. This is a lower bound, not a wall: methods can still operate efficiently relative to the bound, and methods that operate inefficiently leave room for improvement. Our empirical results show that current methods cluster into three regimes (robust fine-tuning, standard fine-tuning, inference-time) corresponding to different effective displacement magnitudes $\Delta$, and that within each regime, performance varies substantially in how closely the bound is approached. The most promising direction for new methods is therefore not "better erasure" or "better retention" in isolation, but \emph{$\kappa$-aware} displacement: applying the displacement only to the activation directions where it is required for erasure, rather than broadly across the spanned adversarial subspace as STEREO does.
+
+\paragraph{$\hat\kappa$ as a diagnostic for unlearning difficulty.}
+$\hat\kappa$ provides a measurable, deployment-agnostic predictor of how difficult a concept will be to unlearn cleanly. Before training any unlearning method, $\hat\kappa$ can be estimated from the base model's activations on the target and a candidate neighbor pool, in a single forward pass per prompt. This estimate predicts not only the absolute severity of the tradeoff but the qualitative regime (low-$\hat\kappa$ concepts admit operating points that high-$\hat\kappa$ concepts do not). For practitioners, this turns concept selection from an empirical trial into a guided choice: when multiple concept descriptions are equivalent for the deployment goal (e.g., erasing "explicit content" via several candidate target concepts), $\hat\kappa$ provides a principled basis for choosing the version most amenable to clean erasure.
+
+\paragraph{Generalization beyond the diffusion setting.}
+While our analysis is developed for text-to-image diffusion models, the structural argument depends only on three properties: (i) the unlearning operation produces an activation displacement at the target concept, (ii) the activation map from prompts to representations is approximately Lipschitz, and (iii) target and neighbor concepts have geometrically overlapping activation regions. These properties are not specific to diffusion. The same form of $\kappa$-scaled tradeoff should apply to concept unlearning in autoregressive language models (where activations are tokens-in-context), in classifiers (where activations are penultimate features), and in multimodal models more broadly. We view our diffusion analysis as a concrete instantiation of a more general phenomenon, with the modality-specific quantities being the choice of activation layer and the prompt-to-activation pipeline.

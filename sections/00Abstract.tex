@@ -1,0 +1,20 @@
+\begin{abstract}
+Concept unlearning in text-to-image diffusion models aims to suppress a target concept, e.g., the object \texttt{horse}, while preserving the model's ability to generate semantically related but distinct content, like \texttt{donkey}. Yet existing methods either leaks under indirect prompts or visibly degrades neighboring concepts.
+
+We prove this is unavoidable. Our main contribution is an impossibility theorem showing that the failure modes arise from the geometry of concept representations, not weaknesses of any particular algorithm. By formalizing concepts as activation-space regions, we show that overlap between a target and its semantic neighbors lower-bounds the collateral damage required for robust erasure. Thus the perfect erasure and neighbor preservation cannot coexist whenever the target overlaps its neighbors, with the tradeoff scaling linearly in the degree of overlap.
+
+We verify this trade-off on seven unlearning methods spanning fine-tuning, adversarially-robust fine-tuning, and inference-time interventions. 
+Averaged over five target concepts, STEREO reduces indirect-prompt recovery (IRR) to $3.5$ but lowers Neighbor Preservation (NP, a concept classifier score on $[0,100]$) to $18.0$, while sparse inference-time methods (SAeUron, SEOT) retain NP $\geq 59$ but leave IRR above $24$.
+The tradeoff is steep for highly entangled concepts (\texttt{horse}, \texttt{cat}, \texttt{dog}, \texttt{bear}) and milder for the more isolated concept \texttt{castle}, which sits well-separated from other concepts in activation space, with NP scaling monotonically in the entanglement coefficient $\hat\kappa$.
+These results suggest that perfect unlearning is the wrong target for entangled concepts. The field should evaluate on the Pareto frontier our theorem establishes; current benchmarks, which decouple unlearning accuracy from neighbor preservation, hide this tradeoff and need to be revised.
+\end{abstract}
+
+% Unlike classical machine unlearning, where the forget and retain sets are typically disjoint, concept unlearning operates on a representation where related concepts share substantial structure:
+% we show that semantically related concepts share overlapping activation regions in diffusion models, so the assumption that erasure and neighbor retention can be optimized independently is fundamentally violated.
+% This entanglement produces two coupled failure modes: \emph{concept leakage}, where an erased concept resurfaces from prompts that omit its name but supply correlated context (e.g., generating a horse from ``a jockey at the racetrack''), and \emph{collateral forgetting}, where pushing erasure harder degrades neighboring concepts the user wanted to keep.
+
+% We formalize this coupling and prove that no unlearning method can simultaneously achieve perfect erasure (suppressing the target on \emph{all} prompts) and perfect preservation of its semantic neighbors, with the unavoidable tradeoff scaling linearly with the degree of representational overlap between the target and its neighbors.
+% any method that suppresses the target concept's generation probability below $\varepsilon$ on \emph{all} prompts must displace the activations of its semantic neighbors by at least $\kappa(1-\varepsilon)/L - \delta$ where $L$ is a Lipschitz constant of the generation pipeline and $\delta$ is the inter-concept activation distance. Setting $\varepsilon = 0$ yields a strict impossibility: perfect erasure and perfect neighbor preservation cannot coexist whenever $\kappa > 0$. 
+% achieving $\epsilon$-robust erasure \varun{what does the eps refer to?} must incur a non-zero error \varun{what does error mean here?} in preserving neighbors, which is a fundamental trade-off between robustness and retention. 
+
+

@@ -1,0 +1,10 @@
+\section{Limitations}
+\label{sec:limitaions}
+\paragraph{Scope of empirical evaluation.}
+Our evaluation covers five target concepts on a single backbone (Stable Diffusion v1.4) and one benchmark family. The five concepts span $\hat\kappa \in [0.27, 0.89]$ but four of five lie in the high-$\hat\kappa$ regime, with architectural concepts represented by a single example. While our $\kappa$-scaling result (Spearman $\rho = -1.0$) is robust within this sample, a broader concept set --- particularly more low-$\hat\kappa$ concepts --- would more sharply test the predicted tradeoff softening at low $\kappa$. Extension to other backbones (SDXL, FLUX) and to non-object concepts (styles, identities) is left to future work.
+
+\paragraph{$\hat\kappa$ estimation.}
+Our $\hat\kappa$ estimator uses a fixed activation layer, denoising timestep, neighbor pool size, and PCA dimensionality. While~\Cref{app:kappa_estimation} shows the estimator is reasonably stable to these choices, $\hat\kappa$ is an empirical proxy for the theoretical $\kappa$ in~\Cref{thm:tradeoff}, and the neighbor pool itself depends on a CLIP-similarity retrieval procedure. Concept-pair contrasts demonstrate the estimator is not purely a function of semantic taxonomy, but the precise correspondence between $\hat\kappa$ and $\kappa$ remains an empirical question.
+
+% \paragraph{Lipschitz validation and the displacement--NP gap.}
+% \Cref{fig:lipschitz_validation} validates Assumption~\ref{ass:lipschitz} on prompt pairs from two concepts, establishing the qualitative form of the assumption rather than a globally tight $L$ value. The Lipschitz constant relevant to~\Cref{thm:tradeoff} is local to $\mathcal{R}_{c_u}$ and may differ from this empirical estimate. Relatedly,~\Cref{thm:tradeoff} bounds activation displacement at neighbors while NP measures probability change; the two are related through Assumption~\ref{ass:lipschitz} but are not identical. Direct empirical measurement of activation displacement would provide a stricter test of the theorem and is a natural next step.
