@@ -10,7 +10,7 @@ in practice, unlearning a target concept produces
 \footnote{We define entanglement formally in \cref{subsec:definitions} based on activation regions in the model's cross-attention space.}
 %, and the severity of that damage is coupled to the robustness \footnote{Throughout this section, ``robustness'' refers informally to how reliably the target concept is suppressed across diverse prompts, including indirect ones that do not mention the concept word. We make this precise as $\varepsilon$-robust unlearning in \cref{def:robust}.} of the erasure. 
 The severity of this damage is coupled to both the strength of the erasure applied to the target concept and the extent of its entanglement with other concepts.
-This coupling is the phenomenon our theoretical framework (\cref{sec:tradeoff}) analyzes.
+This coupling is the phenomenon our theoretical framework analyzes in~\cref{sec:tradeoff}.
 
 % diffusion models exhibit strong \emph{concept entanglement}, where semantically related concepts share overlapping representational structure. 
 % This entanglement produces two observable consequences---concept leakage and collateral forgetting---that we argue are not independent failure modes but rather \emph{dual manifestations of the same underlying phenomenon}: shared representational structure across correlated concepts.
@@ -19,14 +19,14 @@ This coupling is the phenomenon our theoretical framework (\cref{sec:tradeoff}) 
 %Second, semantically neighboring concepts share much of this context (\emph{``a horse in a field''}, \emph{``a donkey in a field''}), causing their activation regions to overlap \varun{so what?}. Together these observations imply that any intervention modifying the activation region of one concept will propagate to its neighbors.
 
 The training mechanisms of text-to-image diffusion models make entanglement inevitable.
-First, diffusion models condition on prompt embeddings produced by text encoders that often exhibit bag-of-words behavior~\citep{yuksekgonul2022and}. As a result, prompts that omit a concept token (e.g., \emph{horse}) but retain its characteristic context (e.g., \emph{jockey}, \emph{saddle}, \emph{racetrack}) can still induce activations associated with that concept. This implies that the visual concept is not localized in a single token, but is instead distributed across multiple correlated context tokens. Second, semantically related concepts share much of this contextual structure (e.g., \emph{a horse in a field''} vs.\ \emph{a donkey in a field''}), which leads to overlapping activation regions in the model’s internal representation space.
+First, diffusion models condition on prompt embeddings produced by text encoders that often exhibit bag-of-words behavior~\citep{yuksekgonul2022and}. As a result, prompts that omit a concept token (e.g., \emph{horse}) but retain its characteristic context (e.g., \emph{jockey}, \emph{saddle}, \emph{racetrack}) can still induce activations associated with that concept (see Figure~\ref{})~\ali{I liked the large figure that we had previously for bag-of-words attack. That is too big for the main body, but I think it is good to add that to the appendix.}. This implies that the visual concept is not localized in a single token, but is instead distributed across multiple correlated context tokens. Second, semantically related concepts share much of this contextual structure (e.g., \emph{a horse in a field''} vs.\ \emph{a donkey in a field''}), which leads to overlapping activation regions in the model’s internal representation space.
 
-\Cref{fig:concept_leakage} illustrates the an example of the consequence of this entanglement. It shows two unlearning methods using \texttt{horse} as the erasure target.
+\Cref{fig:concept_leakage} illustrates an example of the trade-of due to this entanglement. It shows two unlearning methods using \texttt{horse} as the erasure target.
 % \ali{the figure does not seem to match the description here anymore?}.
 Method that perform localized erasure (ESD~\cite{gandikota2023erasing}) successfully suppress generation when the target token is named, but regenerate the concept through indirect prompts that name only context words, which we call \emph{concept leakage}. 
-Methods that erase more aggressively (STEREO~\cite{srivatsan2025stereo}) suppress this leakage but produce visibly degraded outputs for some semantically neighboring concepts, such as \texttt{donkey} and \texttt{zebra}, that are entangled with the target concept (see Figure~\ref{tab:kappa}). We call this effect \emph{collateral damage}. 
+Methods that erase more aggressively (STEREO~\cite{srivatsan2025stereo}) suppress this leakage but produce visibly degraded outputs for some semantically similar concepts, such as \texttt{donkey} and \texttt{zebra}, that are entangled with the target concept (see Figure~\ref{tab:kappa}). We call this effect \emph{collateral damage}. 
 
-Together, these observations imply that modifying the activation region of a target concept necessarily affects other concepts that rely on the same shared representation. In other words, interventions intended to suppress a concept will propagate to concepts with which is it entangled, giving rise to both concept leakage and collateral damage. In~\cref{sec:tradeoff} we formalize this constraint as a provable lower bound on the trade-off between erasure robustness and neighbor preservation. And in~\cref{sec:experiment}, we validate the trade-off quantitatively across seven unlearning methods.
+Together, these observations imply that modifying the activation region of a target concept necessarily affects other concepts that rely on the same shared representation. In other words, interventions intended to suppress a concept will propagate to concepts with which is it entangled, giving rise to both concept leakage and collateral damage. In~\cref{sec:tradeoff} we formalize this constraint as a provable lower bound on the trade-off between erasure effectiveness and utility preservation. And in~\cref{sec:experiment}, we validate the trade-off quantitatively across seven unlearning methods.
 
 \begin{comment}
     \subsection{Why Concepts Are Entangled: Distributed Representations in Diffusion Models}
@@ -144,7 +144,7 @@ This overlap creates the fundamental tension we study: suppressing one concept b
 \begin{minipage}[c]{0.38\linewidth}
 \caption{
 \textbf{Concept entanglement manifests as two coupled effects.}
-Each row erases \texttt{horse} and is probed with three prompt types: \emph{Direct} (mentions ``horse''), \emph{Indirect} (uses correlated context like \emph{jockey} but omits ``horse''), and \emph{Neighbor} (the related concept \texttt{donkey}). ESD leaks horses through indirect prompts but preserves donkey; STEREO suppresses leakage but destroys donkey. We formalize this duality in~\cref{sec:tradeoff}.
+Each row erases \texttt{horse} and is probed with three prompt types: \emph{Direct} (mentions ``horse''), \emph{Indirect} (uses correlated context like \emph{jockey} but omits ``horse''), and \emph{Neighbor} (semantically similar concept \texttt{donkey}). ESD leaks horses through indirect prompts but preserves donkey; STEREO suppresses leakage but destroys donkey. We formalize this duality in~\cref{sec:tradeoff}.
 }
 \label{fig:concept_leakage}
 \end{minipage}

@@ -1,142 +1,7 @@
 \section{The Robustness--Retention Trade-off: A Formal Impossibility Result}
 \label{sec:tradeoff}
 
-We now formalize the coupling observed in~\cref{sec:motivation} as a provable lower bound on the trade-off between erasure robustness and neighbor preservation. The governing quantity is the \emph{concept overlap coefficient} $\kappa$, which measures the fraction of the target concept's activation region shared with its semantic neighbors.
-% The empirical observations in Section~\ref{sec:motivation} suggest that concept leakage and collateral forgetting are coupled consequences of representational overlap. In this section, we make this intuition precise. We introduce a formal framework based on, what we define as, \emph{concept activation regions} in the model's internal representation space and prove that any unlearning method faces a fundamental lower bound on the trade-off between erasure robustness and neighbor preservation. The key quantity governing this trade-off is the \emph{concept overlap coefficient}~$\kappa$, which measures the fraction of the target concept's activation region that is shared with its semantic neighbors.
-
-% \subsection{Setup and Definitions}
-% \label{subsec:definitions}
-% %\ali{the notation for the text encorder doesn't match the one used earlier in the background}
-% Let $\mathcal{D}_\theta$ be a pretrained text-to-image diffusion model with U{-}Net noise predictor $\boldsymbol{\epsilon}_\theta$ and text encoder $f_\psi : \mathcal{P} \to \mathbb{R}^d$, where $\mathcal{P}$ is the space of text prompts. 
-% For a prompt $p \in \mathcal{P}$, we denote its embedding by $\mathbf{e}_p = f_\psi(p) \in \mathbb{R}^d$. 
-% And we write $p_\theta(\mathbf{x} \mid p)$ for the conditional distribution over images induced by $\mathcal{D}_\theta$.
-% Let $\mathcal{D}_{\hat\theta}$ denote a concept-erased model (CEM) obtained by applying an unlearning procedure. %that modifies the U-Net parameters $\theta \mapsto \hat\theta$,
-% %\varun{use tilde for all unlearning related things? don't switch b/w hat and tilde?}
-% We correspondingly write $\boldsymbol{\epsilon}_{\hat\theta}$ for the edited U-Net and $p_{\hat\theta}(\mathbf{x} \mid p)$ for the induced conditional distribution. %\varun{part that bugs me is that $\theta$ is used for both U-Net and full diffusion model?}
-%  % \ali{I think there are still slight notation inconsistency with the evaluation section. For example the unlearned model are shown with $\mathcal{M_u}$ there.}
-
-% % We model a concept through the set of internal activations that arise when the model generates images containing that concept. Concretely, for a fixed UNet layer and denoising timestep, we extract the corresponding cross-attention activation induced by a text prompt. This lets us represent each concept as a region in the model's internal activation space.
-
-% \paragraph{Concept activation regions.}
-% For a fixed probe layer $\ell^*$ and denoising timestep $t^*$, let $\boldsymbol{\Phi}_\theta(p)$ denote the mean-pooled cross-attention activation produced by prompt $p \in \mathcal{P}$, where $\mathcal{H} := \mathbb{R}^{d_{\ell^*}}$ is the activation space at layer $\ell^*$ and $d_{\ell^*}$ is the per-token channel dimension at that layer. Each concept $c \in \mathcal{C}$ is associated with its \emph{activation region} $\mathcal{R}_c \subseteq \mathcal{H}$ produced by prompts whose generated images contain $c$. The formal construction is given in~\cref{app:concept_regions}.
-
-% \noindent The key quantity governing the trade-off is the degree of representational overlap between the target concept and other concepts.
-% To make this precise, for sets $A, B \subseteq \mathcal{H}$ let
-% $d_H(A, B) \;=\; \max\!\left\{\,\sup_{\mathbf{a} \in A}\inf_{\mathbf{b} \in B}\|\mathbf{a}-\mathbf{b}\|_2,\;\; \sup_{\mathbf{b} \in B}\inf_{\mathbf{a} \in A}\|\mathbf{a}-\mathbf{b}\|_2\,\right\}$
-% denote the Hausdorff distance between $A$ and $B$ in $\mathcal{H}$, and for $\rho > 0$ let
-% \begin{equation}
-%     \mathcal{R}_c^{(\rho)}
-%     \;=\;
-%     \bigl\{\mathbf{h} \in \mathcal{H} \;\big|\;
-%     \inf_{\mathbf{r}  \in \mathcal{R}_c}\|\mathbf{h} - \mathbf{r}\|_2 \leq \rho\bigr\}
-% \end{equation}
-% denote the closed $\rho$-neighborhood of $\mathcal{R}_c$ in $\mathcal{H}$. 
-
-
-
-
-%In practice, we estimate $d_H$ from finite activation samples using cosine distances on sample means, which serve as a stable, computationally tractable lower bound on Hausdorff distance under unit-norm activations (see~\cref{app:kappa_estimation}).
-
-% ----- uncomment if have space -----
-% \begin{figure}[t]
-% \centering
-% \begin{tikzpicture}[scale=1.2]
-%   % Fattened (dashed) regions — these overlap to form O
-%   \draw[dashed, thick, blue!60] (-1.2,0) ellipse (1.5 and 1.1);
-%   \draw[dashed, thick, red!60]  (1.2,0)  ellipse (1.5 and 1.1);
-%   % Overlap region O (intersection of the two dashed ellipses), shaded
-%   \begin{scope}
-%     \clip (-1.2,0) ellipse (1.5 and 1.1);
-%     \fill[purple!30] (1.2,0) ellipse (1.5 and 1.1);
-%   \end{scope}
-%   % Core (solid) regions — DISJOINT, close but not overlapping
-%   \draw[thick, blue, fill=blue!12] (-1.2,0) ellipse (1.1 and 0.75);
-%   \draw[thick, red,  fill=red!12]  (1.2,0)  ellipse (1.1 and 0.75);
-%   % Hausdorff distance — between rightmost point of R_{c_u} and leftmost of R_{c'}
-%   \draw[<->, thick] (-0.1,-0.05) -- (0.1,-0.05);
-%   \node[font=\footnotesize, above] at (0,-0.05) {$d_H$};
-%   % rho annotation — vertical double-arrow on top of blue ellipse
-%   \draw[<->, thick, gray] (-1.2,0.75) -- (-1.2,1.1);
-%   \node[font=\footnotesize, gray, right] at (-1.2,0.92) {$\rho$};
-%   % Displacement arrow Delta — from a point inside O outward into R_{c'}
-%   \draw[->, very thick, purple!80!black] (0.05,0.25) -- (0.95,0.25);
-%   \node[font=\footnotesize, purple!80!black, above] at (0.5,0.27) {$\Delta$};
-%   % Region labels
-%   \node[blue!70!black] at (-1.2,0) {$\mathcal{R}_{c_u}$};
-%   \node[red!70!black]  at (1.2,0)  {$\mathcal{R}_{c'}$};
-%   \node[font=\footnotesize, blue!60] at (-2.0,1.25) {$\mathcal{R}_{c_u}^{(\rho)}$};
-%   \node[font=\footnotesize, red!60]  at (2.0,1.25)  {$\mathcal{R}_{c'}^{(\rho)}$};
-%   \node[font=\footnotesize, purple!70!black] at (0,-0.55) {$\mathcal{O}$};
-%   % kappa annotation in lower-left
-%   \node[font=\footnotesize, align=left] at (-2.4,-1.5) 
-%     {$\kappa = \dfrac{\mathrm{vol}(\mathcal{O})}{\mathrm{vol}(\mathcal{R}_{c_u}^{(\rho)})}$};
-% \end{tikzpicture}
-% \caption{Geometric setup of~\cref{thm:tradeoff}. Solid ellipses depict activation regions $\mathcal{R}_{c_u}$ (target) and $\mathcal{R}_{c'}$ (neighbor); dashed boundaries show their $\rho$-fattenings. The Hausdorff distance $d_H$ is the worst-case point-to-set separation between the unfattened regions. The shaded overlap $\mathcal{O} = \mathcal{R}_{c_u}^{(\rho)} \cap \mathcal{R}_{c'}^{(\rho)}$ arises because the fattened regions intersect even though the underlying activation regions do not. An $\varepsilon$-robust unlearning edit displaces target activations by at least $\Delta = (1-\varepsilon)/L$; for points $\mathbf{h}^* \in \mathcal{O}$, this displacement propagates into $\mathcal{R}_{c'}$, yielding the bound $\gamma \geq \kappa\Delta - d_H$.}
-% \label{fig:geometry}
-% \end{figure}
-
-% , which preserves the set-theoretic meaning of the definition under unit normalization (see remark in~\cref{app:proof}).
-% The fattening is a standard regularization that accounts for the fact that activation regions are estimated from finite prompt samples and may not be convex or closed.
-
-
-% \begin{definition}[Concept entanglement coefficient]
-% \label{def:overlap}
-% The \emph{entanglement coefficient} of target concept $c_u$ with respect to its
-% $\delta$-neighborhood and fattening radius $\rho > 0$ is
-% \[
-%     \kappa(c_u,\,\delta,\,\rho)
-%     \;=\;
-%     \frac{
-%         \mathrm{vol}\!\left(
-%             \mathcal{R}_{c_u}^{(\rho)}
-%             \cap
-%             \bigcup_{c' \in \mathcal{N}_\delta(c_u)} \mathcal{R}_{c'}^{(\rho)}
-%             % \bigcup_{\substack{c' \in \mathcal{C},\; c' \neq c_u \\ d_{\mathcal{H}}(\mathcal{R}_{c_u},\,\mathcal{R}_{c'}) < \delta}}
-% \mathcal{R}_{c'}^{(\rho)}
-%         \right)
-%     }{
-%         \mathrm{vol}\!\left(\mathcal{R}_{c_u}^{(\rho)}\right)
-%     },
-% \]
-% where $\mathrm{vol}(\cdot)$  denotes the $n$-dimensional volume of the $\rho$-fattened regions in $\mathcal{H} \cong \mathbb{R}^n$ and  $\mathcal{N}_\delta(c_u) = \{c' \in \mathcal{C} \mid c' \neq c_u,\; d_{\mathcal{H}} (\mathcal{R}_{c_u}, \mathcal{R}_{c'}) < \delta\}$  \ali{can we completely get rid of the neighborhood notion and just do a union over all the remaining concepts?}denotes the set of $\delta$-neighbors of $c_u$.
-% We write $\kappa(c_u, \delta)$ when $\rho$ is held fixed.
-
-% % \ali{why do we need a separate definition of neighborhood? we can directly do a union over all the concepts in this definition and get rid of Definition 4.2. less definitions makes it easier to follow.}
-% \end{definition}
-
-
-
-% \begin{definition}[Concept entanglement coefficient]
-% \label{def:overlap}
-% The \emph{entanglement coefficient} of target concept $c_u$ with respect to its
-% $\delta$-neighborhood and fattening radius $\rho > 0$ is
-% \[
-%     \kappa(c_u,\,\delta,\,\rho)
-%     \;=\;
-%     \frac{
-%         \mathrm{vol}\!\left(
-%             \mathcal{R}_{c_u}^{(\rho)}
-%             \cap
-%             \bigcup_{c' \in \mathcal{C}} \mathcal{R}_{c'}^{(\rho)}
-%             % \bigcup_{\substack{c' \in \mathcal{C},\; c' \neq c_u \\ d_{\mathcal{H}}(\mathcal{R}_{c_u},\,\mathcal{R}_{c'}) < \delta}}
-% %\mathcal{R}_{c'}^{(\rho)}
-%         \right)
-%     }{
-%         \mathrm{vol}\!\left(\mathcal{R}_{c_u}^{(\rho)}\right)
-%     },
-% \]
-% where $\mathrm{vol}(\cdot)$  denotes the $n$-dimensional volume of the $\rho$-fattened regions in $\mathcal{H} \cong \mathbb{R}^n$ 
-% % and  $\mathcal{N}_\delta(c_u) = \{c' \in \mathcal{C} \mid c' \neq c_u,\; d_{\mathcal{H}} (\mathcal{R}_{c_u}, \mathcal{R}_{c'}) < \delta\}$  \ali{can we completely get rid of the neighborhood notion and just do a union over all the remaining concepts?}
-% %denotes the set of $\delta$-neighbors of $c_u$.
-% We write $\kappa(c_u, \delta)$ when $\rho$ is held fixed.
-
-% % \ali{why do we need a separate definition of neighborhood? we can directly do a union over all the concepts in this definition and get rid of Definition 4.2. less definitions makes it easier to follow.}
-% \end{definition}
-% \noindent Intuitively, $\kappa \in [0,1]$ measures what fraction of the target concept's representational footprint is shared with neighboring concepts. When $\kappa = 0$, the concept is fully disentangled from its neighbors and can in principle be erased without collateral damage. When $\kappa > 0$, any edit that displaces activations in $\mathcal{R}_{c_u}$ will inevitably disturb the overlapping portions of $\mathcal{R}_{c'}$.
-% This formalizes the notion of entanglement introduced in Section 3 in terms of activation-space overlap.
-% \varun{i love all of this empirical evidence; but please move to appendix and provide a single line with the main summary/takeaway and a pointer to the appendix!}
-
-
+We now formalize the coupling observed in~\cref{sec:motivation} as a provable lower bound on the trade-off between erasure robustness and concept preservation. The governing quantity is the \emph{concept overlap coefficient} $\kappa$, which measures the fraction of the target concept's activation region shared with the remaining concepts.
 
 \subsection{Setup and Definitions}
 \label{subsec:definitions}
@@ -147,15 +12,32 @@ Let $\mathcal{D}_{\hat\theta}$ denote a concept-erased model (CEM) obtained by a
 We correspondingly write $\boldsymbol{\epsilon}_{\hat\theta}$ for the edited U-Net and $p_{\hat\theta}(\mathbf{x} \mid p)$ for the induced conditional distribution. 
 
 \paragraph{Concept activation regions.}
-For a fixed probe layer $\ell^*$ and denoising timestep $t^*$, let $\boldsymbol{\Phi}_\theta(p)$ denote the mean-pooled cross-attention activation produced by prompt $p \in \mathcal{P}$, where $\mathcal{H} := \mathbb{R}^{d_{\ell^*}}$ is the activation space at layer $\ell^*$ and $d_{\ell^*}$ is the per-token channel dimension at that layer. Each concept $c \in \mathcal{C}$ is associated with its \emph{activation region} $\mathcal{R}_c \subseteq \mathcal{H}$ produced by prompts whose generated images contain $c$. The formal construction is given in~\cref{app:concept_regions}.
-Let
+%For a fixed probe layer $\ell^*$ and denoising timestep $t^*$, let $\boldsymbol{\Phi}_\theta(p)$ denote the mean-pooled cross-attention activation produced by prompt $p \in \mathcal{P}$, where $\mathcal{H} := \mathbb{R}^{d_{\ell^*}}$ is the activation space at layer $\ell^*$ and $d_{\ell^*}$ is the per-token channel dimension at that layer. Each concept $c \in \mathcal{C}$ is associated with its \emph{activation region} $\mathcal{R}_c \subseteq \mathcal{H}$ produced by prompts whose generated images contain $c$. The formal construction is given in~\cref{app:concept_regions}.
+For a fixed probe layer $\ell^*$ and denoising timestep $t^*$, let $\boldsymbol{\Phi}^{\ell^*}_\theta(p)$ denote the mean-pooled cross-attention activation produced by prompt $p \in \mathcal{P}$. 
+For a concept $c \in \mathcal{C}$, we define its \emph{activation region} at layer $\ell^*$ as
 \begin{equation}
-    \mathcal{R}_c^{(\rho)}
+    \mathcal{R}_c (\ell^*)
     \;=\;
-    \bigl\{\mathbf{h} \in \mathcal{H} \;\big|\;
+    \Bigl\{
+        \boldsymbol{\Phi}^{\ell^*}_\theta(p)
+        \;\Big|\;
+        p \in \mathcal{P},\;
+        \mathbb{O}_{\mathcal{X}}\!\left(x_{\theta}(p),\, c\right) = 1
+    \Bigr\}
+    \;\subseteq\; \mathbb{R}^{d_{\ell^*}},
+\end{equation}
+% \ali{this also depends on $\ell^*,t^*$} 
+where $\mathbb{O}_{\mathcal{X}} : \mathcal{X} \times \mathcal{C} \to \{0,1\}$ is an oracle indicating whether concept $c$ is present in image $x$, $x_{\theta}(p) \sim p_{\theta}(\cdot \mid p)$ denotes an image sampled from $\mathcal{D}_\theta$ conditioned on prompt $p$, and $d_{\ell^*}$ is the per-token channel dimension at layer at layer $\ell^*$.
+We also define the closed $\rho$-neighborhood of $\mathcal{R}_c$ as:
+\begin{equation}
+    \mathcal{R}_c^{(\rho)} (\ell^*)
+    \;=\;
+    \bigl\{\mathbf{h} \in \mathbb{R}^{d_{\ell^*}} \;\big|\;
     \inf_{\mathbf{r}  \in \mathcal{R}_c}\|\mathbf{h} - \mathbf{r}\|_2 \leq \rho\bigr\}
 \end{equation}
-denote the closed $\rho$-neighborhood of $\mathcal{R}_c$ in $\mathcal{H}$. The key quantity governing the trade-off is the degree of representational overlap between the target concept and other concepts, defined as follows. 
+
+When clear from context, we drop $\ell^*$ and simply write $\boldsymbol{\Phi}_\theta(p)$ and $\mathcal{R}_c^{(\rho)}$ for brevity.
+The key quantity governing the trade-off is the degree of representational overlap between the target concept and other concepts, defined as follows. 
 
 
 \begin{definition}
@@ -174,150 +56,94 @@ The \emph{entanglement coefficient} of target concept $c_u$ with fattening radiu
         \mathrm{vol}\!\left(\mathcal{R}_{c_u}^{(\rho)}\right)
     },
 \]
-where $\mathrm{vol}(\cdot)$ denotes the $n$-dimensional volume of subsets of $\mathcal{H} \cong \mathbb{R}^n$.
+where $\mathrm{vol}(\cdot)$ denotes the $n$-dimensional volume of subsets of $\mathbb{R}^n$.
 \end{definition}
 
 \noindent Intuitively, $\kappa \in [0,1]$ measures what fraction of the target concept's representational footprint overlaps with that of other concepts in the model. When $\kappa = 0$, the concept is fully disentangled and can in principle be erased without collateral damage. When $\kappa > 0$, any edit that displaces activations in $\mathcal{R}_{c_u}$ will inevitably disturb overlapping portions of other concepts' activation regions.
-This formulation aggregates overlap across all concepts. In practice, however, the contribution to $\kappa$ is dominated by concepts that occupy nearby regions of the activation space; distant concepts contribute negligibly to the intersection. 
-
-
-% \paragraph{Quantifying entanglement.}
-% \Cref{tab:kappa} reports the estimated entanglement coefficient $\hat\kappa$ for five target concepts under a fixed fattening radius $\rho$ and a per-concept neighbor set $\mathcal{N}_\delta(c_u)$ discovered from data (\cref{app:kappa_estimation}).
-% % \varun{don't understand this statement -- entanglement is calculated w.r.t what?}
-% Each $\hat\kappa(c_u)$ is computed against that concept's own discovered neighbor set, listed in the rightmost column of~\cref{tab:kappa}, under a single shared $(\delta,\rho)$ across rows.
-% The four animal subtypes (\texttt{dog}, \texttt{bear}, \texttt{horse}, \texttt{cat}) overlap substantially with fine-grained synonyms (e.g., \texttt{donkey}, \texttt{mare} for \texttt{horse}), while castle's architectural neighbors occupy more distinct regions despite semantic relatedness. 
-% This $\hat\kappa$ heterogeneity is precisely the dose-response axis along which~\Cref{thm:tradeoff} predicts collateral damage should scale: erasing a high-$\hat\kappa$ concept should incur substantially larger neighbor-preservation error than erasing a low-$\hat\kappa$ one. We test this prediction in~\cref{sec:experiment}. The small number of targets here reflects the cost of the per-target erasure benchmark in~\cref{sec:experiment}; estimation details and sensitivity analyses are in~\cref{app:kappa_estimation}.
-
+This formulation aggregates overlap across all concepts. In practice, however, the contribution to $\kappa$ is dominated by concepts that occupy nearby regions of the activation space and distant concepts contribute negligibly to the intersection. 
 
 \paragraph{Quantifying entanglement.}
-\Cref{tab:kappa} reports the estimated lower-bound for entanglement coefficient $\hat\kappa$ for five target concepts under a fixed fattening radius $\rho$ (\cref{app:kappa_estimation}). Each $\hat\kappa(c_u)$ is computed by measuring the fraction of activation samples from $c_u$ that lie within distance $\rho$ of any activation from other concepts. 
-The four animal subtypes (\texttt{dog}, \texttt{bear}, \texttt{horse}, \texttt{cat}) exhibit substantial overlap with fine-grained variants (e.g., \texttt{donkey}, \texttt{mare} for \texttt{horse}), while \texttt{castle} exhibits significantly lower overlap despite having semantically related concepts. 
-This heterogeneity in $\hat\kappa$ defines the regime in which~\Cref{thm:tradeoff} predicts collateral damage should scale: erasing a high-$\hat\kappa$ concept incurs substantially larger preservation error than erasing a low-$\hat\kappa$ one. We test this prediction in~\cref{sec:experiment}. Estimation details and sensitivity analyses are in~\cref{app:kappa_estimation}.
+\Cref{tab:kappa} reports the estimated lower-bound for entanglement coefficient $\hat\kappa$ for five target concepts under a fixed fattening radius $\rho$ (\cref{app:kappa_estimation}). Each $\hat\kappa(c_u)$ is computed by measuring the fraction of activation samples from $c_u$ that lie within distance $\rho$ of any activation from other concepts (see Appendix~\ref{} for details)\ali{add a subsection in the appendix with details of this experiment}.
+The four animal subtypes (\texttt{dog}, \texttt{bear}, \texttt{horse}, \texttt{cat}) exhibit substantial overlap with fine-grained variants (e.g., \texttt{donkey}, \texttt{mare} for \texttt{horse}), while \texttt{castle} exhibits significantly lower overlap. % despite having semantically related concepts. 
+This heterogeneity in $\hat\kappa$ defines the regime in which~\Cref{thm:tradeoff} predicts collateral damage should scale: erasing a high-$\hat\kappa$ concept incurs substantially larger preservation error than erasing a low-$\hat\kappa$ one. We validate this hypothesis in~\cref{subsec:kappa_scaling}. 
+%Estimation details and sensitivity analyses are in~\cref{app:kappa_estimation}.
 
 We now define the two desiderata that any unlearning method must satisfy:
+
 \begin{definition}[$\varepsilon$-robust unlearning]
 \label{def:robust}
-The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\varepsilon$-robust unlearning} of concept $c_u$ if, for all prompts $p \in \mathcal{P}$ (including indirect prompts that do not
-explicitly mention $c_u$),
+The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\varepsilon$-robust unlearning} of concept $c_u$ if, for all prompts $p \in \mathcal{P}$,% (including indirect prompts that do not explicitly mention $c_u$),
 \begin{equation}
     \Pr_{\mathbf{x} \sim p_{\hat\theta}(\cdot \mid p)}
 \!\left[
 \mathbb{O}_{\mathcal{X}}(\mathbf{x} ,\, c_u) = 1
 \right]
-\;<\; \varepsilon.
+\;<\; \varepsilon,
 \end{equation}
-where $\mathbb{O}_{\mathcal{X}} : \mathcal{X} \times \mathcal{C} \to \{0,1\}$ is the oracle concept detector introduced in~\cref{app:concept_regions}. The worst-case quantifier reflects an adversarial threat model; in~\cref{sec:experiment} we additionally report the corresponding average-case quantity UA.
+where $\mathbb{O}_{\mathcal{X}} : \mathcal{X} \times \mathcal{C} \to \{0,1\}$ is the oracle concept detector. 
+% The worst-case quantifier reflects an adversarial threat model (see~\cref{subsec:setup}) \ali{again the section reference is too general. use the specific subsections when possible}.  % we additionally report the corresponding average-case quantity UA.
 \end{definition}
 
-% \varun{should be $x \sim \bar{f}_{\boldsymbol{\boldsymbol{\Phi}}}(.|p)$?}
-
+\paragraph{Intuition.} Definition~\ref{def:robust} considers an unlearned model $\epsilon$-robust if any prompt cannot generate the erased concept with probability larger than or equal to $\epsilon$. See~\cref{app:concept_regions} for more details on the oracle.
 
 \begin{definition}[$\gamma$-concept preservation]
 \label{def:neighbor}
 Let $\mathcal{P}_{c'} \subseteq \mathcal{P}$ denote the set of prompts associated with concept $c'$. 
-The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-concept preservation} if, for all $c' \in \mathcal{C}$ with $c' \neq c_u$,
+The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-concept preservation} with respect to layer ${\ell^*}$ if, for all $c' \in \mathcal{C} \setminus \{c_u\}$,
 \begin{equation}
-    \mathbb{E}_{p \sim \mathcal{P}_{c'}}\!\left[\bigl\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_\theta(p)\bigr\|_2\right]
+    \mathbb{E}_{p \sim \mathcal{P}_{c'}}\!\left[\bigl\|\boldsymbol{\Phi}^{\ell^*}_{\hat\theta}(p) - \boldsymbol{\Phi}^{\ell^*}_\theta(p)\bigr\|_2\right]
     \;<\; \gamma.
 \end{equation}
 \end{definition}
 
-\noindent \Cref{def:robust} captures robustness to indirect prompts, while~\cref{def:neighbor} captures preservation of non-target concepts. Our main result below shows these two requirements are in tension.
+\paragraph{Intuition.} An unlearned model has $\gamma$-concept preservation at a specific layer if for any concept other than the target concept, it does not displace their representations at that layer by larger than or equal to $\gamma$.
 
-% \begin{definition}[$\gamma$-neighbor preservation]
-% \label{def:neighbor}
-% Let $\mathcal{P}_{c'} \subseteq \mathcal{P}$ denote the set of prompts associated with concept $c'$.
-% % The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-neighbor preservation} with respect to $\mathcal{N}_\delta(c_u)$ if, 
-% % for all $c' \in \mathcal{N}_\delta(c_u)$,
-% The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-neighbor preservation} at radius $\delta$ if, for all $c' \in \mathcal{C}$ with $c' \neq c_u$ and $d_{\mathcal{H}}(\mathcal{R}_{c_u}, \mathcal{R}_{c'}) < \delta$,
-% \begin{equation}
-%     \mathbb{E}_{p \sim \mathcal{P}_{c'}}\!\left[\bigl\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_\theta(p)\bigr\|_2\right]
-%     \;<\; \gamma.
-% \end{equation}
-% \end{definition}
 
-% \noindent \Cref{def:robust} captures robustness to indirect prompts while~\cref{def:neighbor} captures preservation of neighboring concepts. Our main result below shows these two requirements are in tension.
 
-\subsection{Main Result: The trade-off Lower Bound}
+\subsection{Main Result: The Trade-off Lower Bound}
 \label{subsec:main_result}
-We require two mild regularity assumptions. Let $g_\theta: \mathcal{H} \to [0, 1]$ denote the composed map 
-\begin{equation}
-    g_\theta(h; c) \;:=\; \Pr_{\mathbf{x} \sim p_\theta(\cdot \mid \boldsymbol{\Phi}_\theta^{-1}(h))}\!\left[\mathbb{O}_{\mathcal{X}}(\mathbf{x}, c) = 1\right],
-\end{equation}
-i.e., the probability that concept $c$ appears in an image generated from an activation $h \in \mathcal{H}$. 
-% remaining U-Net denoising steps (from layer $\ell^*$ onward) and the VAE decoder $V$. By construction, concept generation probability at prompt $p$ under model $\theta$ equals $g_\theta(\boldsymbol{\Phi}_\theta(p); c)$.
+
+In this section, we show that $\epsilon$-robust unlearning and $\gamma$-concept preservation are fundamentally in tension.
+We begin by stating two mild regularity assumptions that formalize how perturbations in activation space affect generation.
+
 \begin{assumption}[Lipschitz continuity of generation]
 \label{asm:lip}
-For each concept $c \in \mathcal{C}$, 
-$g_\theta(\cdot; c)$ is $L$-Lipschitz in the cross-attention activation at layer $\ell^*$, in the following sense: for any two activations $h, h' \in \mathcal{H}$ fed into the remainder of the generation pipeline 
-%(UNet layers after $\ell^*$, VAE decoder $V$, and concept oracle),
+Let $\mathcal{H} = \mathbb{R}^{d_{\ell^*}}$ denote the cross-attention activation space at layer $\ell^*$.
+For each concept $c \in \mathcal{C}$, the generation probability is Lipschitz continuous with respect to activations:
 \begin{equation}
-    \bigl|
-    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_h, c) = 1]
+    \left|
+    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\mathbf{h}},c)=1]
     -
-    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{h'}, c) = 1]
-    \bigr|
-    \;\leq\;
-    L\,\|h - h'\|_2.
+    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\mathbf{h}'},c)=1]
+    \right|
+    \leq
+    L\|\mathbf{h}-\mathbf{h}'\|_2,
+    \quad \forall \mathbf{h}, \mathbf{h}' \in \mathcal{H}.
 \end{equation}
-where $x_h$ denotes an image generated from activation $h$. We further assume the unlearning edit modifies only layers at or before $\ell^*$, so the downstream pipeline is identical between $\mathcal{D}_\theta$ and $\mathcal{D}_{\hat\theta}$.
-\end{assumption}
-% \yian{empirical results: change the prompts a little bit and see if distance on embedding space changes (4.1 + 4.6)}
 
-% \varun{i love all of this empirical evidence; but please move to appendix and provide a single line with the main summary/takeaway and a pointer to the appendix!}
+where $\mathbf{x}_{\mathbf{h}} \sim p_\theta(\cdot \mid \boldsymbol{\Phi}_\theta^{-1}(\mathbf{h}))$
+denotes an image generated from an activation vector $\mathbf{h}$.
+
+\end{assumption}
+
 \begin{assumption}[Minimum displacement for erasure]
 \label{asm:edit}
-Any unlearning edit $\theta \mapsto \hat\theta$ that achieves $\varepsilon$-robust unlearning of $c_u$ must displace activations within $\mathcal{R}_{c_u}$ by at least $\Delta > 0$:
+Any unlearning edit $\theta \mapsto \hat{\theta}$ that achieves $\varepsilon$-robust unlearning of $c_u$ must displace activations within $\mathcal{R}_{c_u}$ by at least $\Delta>0$:
 \begin{equation}
-    \forall\, p \in \mathcal{P} \;\text{ s.t. }\;
-    \boldsymbol{\Phi}_{\theta}(p) \in \mathcal{R}_{c_u}:\quad
-    \bigl\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_{\theta}(p)\bigr\|_2
-    \;\geq\; \Delta.
+    \forall p \in \mathcal{P}
+    \text{ such that }
+    \boldsymbol{\Phi}_{\theta}(p)\in \mathcal{R}_{c_u}:
+    \quad
+    \|\boldsymbol{\Phi}_{\hat{\theta}}(p)-\boldsymbol{\Phi}_{\theta}(p)\|_2
+    \geq
+    \Delta .
 \end{equation}
 \end{assumption}
-\noindent We empirically verify~\cref{asm:lip} across natural prompt variations and~\cref{asm:edit} across seven unlearning methods erasing \texttt{horse}; all measured pairs satisfy Lipschitz with a small empirical constant, 
+
+We empirically verify assumption~\ref{asm:lip} across natural prompt variations and assumption~\ref{asm:edit} across seven unlearning methods erasing \texttt{horse}; all measured pairs satisfy Lipschitz with a small empirical constant, 
 % and displacement propagates to semantic neighbors more than to controls. 
 and displacement propagates to other concepts through shared activation structure.
 Full details are in~\cref{app:lipschitz,app:displacement}.
-
-% All five methods produce substantial displacement on target prompts ($\Delta_{\mathrm{target}} \geq 3.2$), confirming that $\varepsilon$-robust erasure requires non-trivial activation displacement as posited by~\cref{asm:edit}.
-% Crucially, the displacement propagates to semantic neighbors: for every method, $\Delta_{\mathrm{neighbor}} > \Delta_{\mathrm{control}}$, and the gap is largest for STEREO ($\Delta_{\mathrm{neighbor}} - \Delta_{\mathrm{control}} = 3.26$), the method with the strongest erasure robustness. 
-% This is consistent with Theorem~\ref{thm:tradeoff}: displacement within $\mathcal{R}_{c_u}$ propagates to overlapping neighbor regions in proportion to $\kappa$, causing greater collateral damage for high-$\kappa$ neighbors than for low-$\kappa$ controls.
-
-% \varun{i love all of this empirical evidence; but please move to appendix and provide a single line with the main summary/takeaway and a pointer to the appendix!}
-% \begin{theorem}[Robustness--Retention trade-off]
-% \label{thm:tradeoff}
-% Let Assumptions~\ref{asm:lip} and~\ref{asm:edit} hold with constants $L$ and $\Delta$.
-% Let $\rho > 0$ be the fattening radius from Definition~\ref{def:overlap}.
-% Suppose $\mathcal{D}_{\hat\theta}$ achieves $\varepsilon$-robust unlearning of $c_u$
-% (Definition~\ref{def:robust}).
-% % Then for any neighbor $c' \in \mathcal{N}_\delta(c_u)$ with
-% % $\mathcal{R}_{c'}^{(\rho)} \cap \mathcal{R}_{c_u}^{(\rho)} \neq \emptyset$,
-% Then for any $c' \in \mathcal{C}$ with $c' \neq c_u$,
-% $d_{\mathcal{H}}(\mathcal{R}_{c_u}, \mathcal{R}_{c'}) < \delta$, and
-% $\mathcal{R}_{c'}^{(\rho)} \cap \mathcal{R}_{c_u}^{(\rho)} \neq \emptyset$,
-% the neighbor preservation error satisfies
-% \begin{equation}
-%     \mathbb{E}_{p \sim \mathcal{P}_{c'}}\!\left[\bigl\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_\theta(p)\bigr\|_2\right]
-%     \;\geq\;
-%     \kappa(c_u,\delta) \cdot \Delta
-%     \;-\; \delta,
-% \end{equation}
-% and consequently, $\gamma$-neighbor preservation (Definition~\ref{def:neighbor}) requires
-% \begin{equation}
-% \label{eq:tradeoff}
-%     \boxed{
-%     \gamma \;\geq\; \kappa(c_u,\delta)\cdot\frac{1-\varepsilon}{L}
-%     \;-\; \delta.
-%     }
-% \end{equation}
-% Equivalently, achieving both $\varepsilon$-robustness and $\gamma$-neighbor preservation simultaneously requires
-% \begin{equation}
-% \label{eq:tradeoff_eps}
-%     \varepsilon \;\geq\; 1 - \frac{L(\gamma + \delta)}{\kappa(c_u,\delta)}.
-% \end{equation}
-% \end{theorem}
-
 
 \begin{theorem}[Robustness--Retention trade-off]
 \label{thm:tradeoff}
@@ -353,11 +179,8 @@ Equivalently, achieving both $\varepsilon$-robustness and $\gamma$-concept prese
 \end{theorem}
 
 
-
-
-
 \begin{proof}[Proof sketch]
-By~\cref{asm:lip}, %$\varepsilon$-robust unlearning requires displacing all activations in $\mathcal{R}_{c_u}$ by at least $\Delta = (1-\varepsilon)/L$. This displacement propagates to the fraction $\kappa(c_u,\delta)$ of $\mathcal{R}_{c'}$ that overlaps with $\mathcal{R}_{c_u}^{(\rho)}$, minus at most $\delta$ due to inter-concept distance. 
+By assumption~\ref{asm:lip}, %$\varepsilon$-robust unlearning requires displacing all activations in $\mathcal{R}_{c_u}$ by at least $\Delta = (1-\varepsilon)/L$. This displacement propagates to the fraction $\kappa(c_u,\delta)$ of $\mathcal{R}_{c'}$ that overlaps with $\mathcal{R}_{c_u}^{(\rho)}$, minus at most $\delta$ due to inter-concept distance. 
 $\varepsilon$-robust unlearning requires displacing all activations in $\mathcal{R}_{c_u}$ by at least $\Delta = (1-\varepsilon)/L$. By Definition~\ref{def:overlap}, a fraction $\kappa(c_u,\rho)$ of the fattened region $\mathcal{R}_{c_u}^{(\rho)}$ overlaps with non-target concept regions. This displacement therefore affects at least a $\kappa(c_u,\rho)$ fraction of the shared activation mass, yielding an aggregate collateral displacement of at least $\kappa(c_u,\rho)\cdot \Delta$.
 % For any neighbor $c'$ whose fattened activation region overlaps with $\mathcal{R}_{c_u}^{(\rho)}$, the displacement in the overlap region propagates to $\mathcal{R}_{c'}$, yielding a lower bound proportional to the overlap fraction $\kappa(c_u,\delta)$ minus the inter-concept distance $\delta$. Then substituting $\Delta = (1-\varepsilon)/L$ yields the stated bound on $\gamma$. 
 Full proof is given in Appendix~\ref{app:proof}.
@@ -387,7 +210,6 @@ Eq.~\eqref{eq:tradeoff_eps} defines a \emph{feasibility boundary} in the $(\vare
 $\gamma = \kappa \cdot \frac{1-\varepsilon}{L}.$
 Different unlearning methods correspond to different operating points on or above this curve: aggressive methods achieve small $\varepsilon$ at the cost of large $\gamma$, occupying the upper-left of the frontier; conservative methods accept large $\varepsilon$ to maintain small $\gamma$, occupying the lower-right.
 In Section~\ref{sec:experiment}, we verify that the empirically observed operating points across seven methods are consistent with this predicted boundary.
-
 
 
 % \paragraph{Empirical validation.}
