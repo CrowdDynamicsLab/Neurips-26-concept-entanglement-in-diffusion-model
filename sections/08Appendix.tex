@@ -718,6 +718,19 @@ Our automated evaluation protocol is designed to measure two coupled consequence
 \paragraph{Correlated context extraction.}
 For each target concept $c$, we collect a target-matched caption subset from LAION~\citep{schuhmann2022laion} aligned with diffusion-model pretraining. Specifically, we identify captions that explicitly contain $c$ or its lexical variants, and extract co-occurring content words and short phrases from this subset. We remove stopwords, punctuation, low-information function words, and lexical forms that directly mention the target concept. The remaining candidates are ranked using corpus-level association statistics and filtered to obtain a final set of correlated context words that captures the contextual footprint of $c$ in the training distribution. For example, when $c=\texttt{horse}$, the resulting set includes terms such as \texttt{jockey}, \texttt{stable}, \texttt{saddle}, \texttt{racetrack}, and \texttt{polo}, for $c = \texttt{castle}$, it includes \texttt{moat}, \texttt{turret}, \texttt{medieval}, \texttt{knight}, and \texttt{drawbridge}.
 
+To visualize how these correlated prompts organize in text-embedding space, we pool prompts that explicitly mention the target concept and prompts that omit the target token but retain correlated context, then project their CLIP text embeddings to two dimensions with PCA. \Cref{fig:bow_context_span} shows that context-rich prompts occupy a nearby region rather than a disjoint cluster, supporting our bag-of-words motivation that concept evidence is distributed across correlated tokens rather than isolated in a single concept word.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{img/bow_context_span.png}
+\caption{
+\textbf{Context-only prompts remain close to target prompts in CLIP text-embedding space.}
+PCA projection of pooled prompts used for the \texttt{horse} case study. One group explicitly contains the concept token, while the other omits it but retains correlated context words (e.g., \texttt{jockey}, \texttt{saddle}, \texttt{racetrack}). The proximity between these groups illustrates why token-level erasure can remain vulnerable to indirect contextual prompts.
+}
+\label{fig:bow_context_span}
+\end{figure}
+
+
 \paragraph{Indirect recovery prompts.}
 We use the correlated context set for $c$ to construct a set of indirect prompts $\mathcal{P}_{\mathrm{ind}}(c)$. These prompts are generated under an explicit lexical exclusion constraint: they must not contain the target token or excluded lexical variants of $c$. Intuitively, $\mathcal{P}_{\mathrm{ind}}(c)$ probes whether the erased concept can still be elicited through contextual associations alone, without direct lexical mention. To improve prompt diversity while preserving control, we generate multiple prompts from different subsets of the correlated context words and retain only prompts that satisfy the exclusion rule.
 
