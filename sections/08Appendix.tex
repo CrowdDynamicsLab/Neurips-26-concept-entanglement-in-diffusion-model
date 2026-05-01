@@ -722,7 +722,7 @@ To visualize how these correlated prompts organize in text-embedding space, we p
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{img/bow_context_span.png}
+\includegraphics[width=\linewidth]{img/bag_of_words_span.pdf}
 \caption{
 \textbf{Context-only prompts remain close to target prompts in CLIP text-embedding space.}
 PCA projection of pooled prompts used for the \texttt{horse} case study. One group explicitly contains the concept token, while the other omits it but retains correlated context words (e.g., \texttt{jockey}, \texttt{saddle}, \texttt{racetrack}). The proximity between these groups illustrates why token-level erasure can remain vulnerable to indirect contextual prompts.
