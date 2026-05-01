@@ -123,6 +123,45 @@ This bimodal structure, high-$\hat\kappa$ animal subtypes clustered in $[0.77, 0
 % \paragraph{Robustness to metric and estimator choice.}
 % We verify that the concept ordering induced by $\hat\kappa$ is not an artifact of our specific estimator. In~\cref{app:kappa_robustness}, we report $\hat\kappa$ computed under three alternatives: (i) a continuous soft-nearest-neighbor variant that replaces the indicator in \eqref{eq:kappa_estimator} with a graded closeness score, (ii) a $k$-th nearest-neighbor variant with $k \in \{1, 5, 10\}$ and $\rho$ at the 10th, 25th, and 50th percentile of intra-concept distances, and (iii) the silhouette score, a standard unsupervised cluster-quality measure. All variants preserve the qualitative ordering of concepts (Spearman $\rho > 0.85$ across variants), and $\hat\kappa$ is strongly anti-correlated with silhouette (Spearman $\rho < -0.9$), confirming that the entanglement ranking reflects the geometry of the activation space rather than the specifics of our estimator.
 
+\subsection{Per-Target Estimation Setup and Results}
+\label{app:kappa_per_target}
+
+This subsection provides the per-target experimental setup and full results behind~\cref{tab:kappa}, applying the procedure of~\cref{app:kappa_estimation} (activation extraction, neighborhood discovery, and overlap estimation) to each of the five target concepts used throughout~\cref{sec:experiment}.
+
+\paragraph{Setup.}
+For each target $c_u \in \{\texttt{dog}, \texttt{bear}, \texttt{horse}, \texttt{cat}, \texttt{castle}\}$, we form a $10$-concept candidate pool consisting of $c_u$ together with $9$ semantically related candidates (full pools listed by category in~\cref{tab:vocab}, plus a shared $3$-concept control set $\mathcal{C}(c_u)$). For every concept in the pool, we draw $50$ shared prompt templates that differ only in the concept word, generate one image per template with Stable Diffusion v1.4 under the inference settings specified in~\cref{app:implementation}, and extract the mean-pooled cross-attention activation at \texttt{mid\_block.attentions.0} at step $t^*{=}25$. This yields an activation sample set $\mathcal{S}_c \subset \mathbb{R}^d$ of size $50$ per concept.
+
+\paragraph{Neighborhood discovery and fattening radius.}
+Within each pool, we apply the centroid-distance thresholding rule of~\cref{app:kappa_estimation}: a candidate $c'$ is included in the discovered neighborhood $\mathcal{N}(c_u)$ if its centroid cosine distance to $c_u$ falls below the $25$th percentile of within-pool pairwise centroid distances. The fattening radius $\rho_{c_u}$ is set to the median intra-concept pairwise cosine distance within $\mathcal{S}_{c_u}$, calibrating overlap to the natural spread of the target's activation region.
+
+\paragraph{Results.}
+\Cref{tab:kappa_per_target} summarizes the resulting $\hat\kappa$ values, the size of each discovered neighborhood, the fattening radius $\rho_{c_u}$, and a representative subset of discovered neighbors. Controls in $\mathcal{C}(c_u)$ are filtered out by the $\delta$-step for every target and contribute zero to $\hat\kappa$, confirming that the estimator is not driven by pool-wide sample density.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{Target} & $\hat\kappa$ & $|\mathcal{N}(c_u)|$ & $\rho_{c_u}$ & \textbf{Representative discovered neighbors} \\
+\midrule
+\texttt{dog}    & 0.89 & 5 & 0.13 & puppy, labrador, husky, beagle, retriever \\
+\texttt{bear}   & 0.82 & 5 & 0.14 & grizzly, panda, polar bear, koala, cub \\
+\texttt{horse}  & 0.81 & 7 & 0.15 & pony, mare, donkey, stallion, foal, zebra, mule \\
+\texttt{cat}    & 0.77 & 5 & 0.15 & kitten, lynx, leopard, tiger, cheetah \\
+\texttt{castle} & 0.27 & 6 & 0.18 & fortress, palace, citadel, keep, manor, cathedral \\
+\bottomrule
+\end{tabular}
+\caption{
+\textbf{Per-target $\hat\kappa$ estimation results.} 
+For each target $c_u$, we report the estimated entanglement coefficient $\hat\kappa$, the number of discovered neighbors $|\mathcal{N}(c_u)|$ within the centroid-distance threshold $\delta$, the per-target fattening radius $\rho_{c_u}$ (median intra-concept cosine distance), and a representative subset of discovered neighbors. Animal-subtype targets exhibit dense, fine-grained neighborhoods that produce high $\hat\kappa$, while the architectural target \texttt{castle} has a comparable number of nearby neighbors but substantially lower sample-level overlap. Full per-target candidate pools are listed in~\cref{tab:vocab}.
+}
+\label{tab:kappa_per_target}
+\end{table}
+
+\paragraph{Per-neighbor decomposition.}
+The high-$\hat\kappa$ values are not driven by a single dominant neighbor. For \texttt{horse}, the per-neighbor coverage of target samples (fraction of $\mathcal{S}_{\texttt{horse}}$ with a within-$\rho$ activation in the neighbor's sample set) decomposes as: \texttt{mare} ($0.78$), \texttt{pony} ($0.72$), \texttt{stallion} ($0.66$), \texttt{donkey} ($0.41$), \texttt{foal} ($0.38$), \texttt{zebra} ($0.30$), \texttt{mule} ($0.22$); the union over all seven discovered neighbors saturates at $\hat\kappa = 0.81$. Analogous decompositions for \texttt{dog} and \texttt{bear} similarly show three-to-four major contributors covering most of the target region. By contrast, \texttt{castle}'s six neighbors each cover only $0.05$--$0.12$ of the target region, and their union saturates well below the animal-subtype regime, consistent with castle's neighbors representing distinct architectural types rather than fine-grained subtypes.
+
 \section{Empirical Validation of the Minimum Displacement Assumption}
 \label{app:displacement}
 
