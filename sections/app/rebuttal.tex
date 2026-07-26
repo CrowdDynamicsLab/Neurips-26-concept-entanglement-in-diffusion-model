@@ -1,0 +1,26 @@
+\newpage
+\section{New Baselines}
+\begin{table}[]
+    \centering
+    \resizebox{\textwidth}{!}{
+\begin{tabular}{llcccccc}
+\toprule
+& & \multicolumn{2}{c}{\textbf{Erasure}} & \multicolumn{3}{c}{\textbf{Retention}} & \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-7}
+\textbf{Method} & \textbf{Type} & UA$\uparrow$ & IRR$\downarrow$ & IRA$\uparrow$ & NP$\uparrow$ & CP$\uparrow$ & DamageGap$\downarrow$ \\
+\midrule
+Original    & --          & 0     & 27.0  & 78.92 & 100   & 100   & --    \\
+\midrule
+uCE    & Closed-form & $80.6 \pm 18.4$ & $10.5 \pm 23.4$ & $67.1 \pm 12.4$ & $99.1 \pm 25.1$ & $99.3 \pm 3.1$  & $0.2 \pm 25.4$ \\
+RECE   & Closed-form & $99.4 \pm 0.9$  & $3.0 \pm 4.0$   & $43.3 \pm 12.1$ & $56.1 \pm 10.6$  & $93.5 \pm 2.0$  & $37.4 \pm 10.2$ \\
+\midrule
+CPE    & FT          & $99.6 \pm 0.9$  & $4.7 \pm 9.4$   & $53.4 \pm 12.4$ & $78.0 \pm 18.1$  & $97.3 \pm 2.6$ & $19.0 \pm 19.3$ \\
+\midrule
+SLD    & Inf. & $99.6 \pm 0.9$  & $0.5 \pm 0.9$   & $35.0 \pm 8.1$  & $58.8 \pm 16.8$  & $89.1 \pm 4.1$  & $30.3 \pm 16.3$ \\
+SAFREE & Inf. & $91.4 \pm 11.4$ & $8.4 \pm 10.2$  & $39.9 \pm 8.6$  & $64.7 \pm 16.0$  & $85.7 \pm 12.2$ & $21.0 \pm 19.4$ \\
+\bottomrule
+\end{tabular}}
+    \caption{Caption}
+    \label{tab:placeholder}
+\end{table}
+\section{New Concepts}

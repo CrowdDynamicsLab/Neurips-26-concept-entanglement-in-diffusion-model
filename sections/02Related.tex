@@ -9,21 +9,27 @@ We briefly introduce the latent diffusion notation used throughout the paper, si
 \textbf{Text-to-image latent diffusion models.}
 We consider a text-to-image latent diffusion model (LDM) of the form introduced in Stable Diffusion~\citep{rombach2022high}.
 % We consider a text-to-image latent diffusion model (LDM), following Stable Diffusion~\citep{rombach2022high} \varun{what does it mean to follow?}. 
-An input image $x \in \mathcal{X}$ is first mapped by a pretrained variational autoencoder encoder $E$ into a latent representation $z = E(x) \in \mathcal{Z}$, and reconstructed by a decoder $V : \mathcal{Z} \rightarrow \mathcal{X}$. 
+An input image $\mathbf{x} \in \mathcal{X}$ is first mapped by a pretrained variational autoencoder encoder $E$ into a latent representation 
+% \varun{the latent z is bold-faced in the next line, not bold-faced here? subsequent usages are also mixed in usage} 
+$\mathbf{z} = E(x) \in \mathcal{Z}$, and reconstructed by a decoder $V : \mathcal{Z} \rightarrow \mathcal{X}$. 
 
 % \ali{I think this is extra info: 
 % Instead of modeling pixels directly, the diffusion model operates in latent space, which substantially reduces computation while preserving semantic content.}
 Given a latent $\mathbf{z}$, the forward diffusion process corrupts it with Gaussian noise to obtain $\mathbf{z}_t$ at timestep $t \in \{1,\dots,T\}$. 
-A time-conditioned U-Net $\boldsymbol{\epsilon}_\theta$ is then trained to predict the noise $\boldsymbol{\epsilon}$ added to $\mathbf{z}_t$. 
+A time-conditioned U-Net $\boldsymbol{\epsilon}_\theta$ is then trained to predict the noise $\boldsymbol{\epsilon}$ 
+% \varun{i would change noise variable to $\eta$ to avoid confuson with the U-net} 
+% \yian{kept $\epsilon$/$\epsilon_\theta$ for noise/U-Net to match the standard DDPM convention used in every concept-erasure baseline we compare against (ESD, STEREO, SAeUron, AdvUnlearn).}
+added to $\mathbf{z}_t$. 
 In text-conditioned generation, a prompt $p \in \mathcal{P}$ is encoded by a text encoder $f_{\psi}$ into text features $\mathbf{e}_p = f_{\psi}(p)$, and these features condition the U-Net through cross-attention layers. 
 The standard latent diffusion objective is
 \begin{equation}
+\label{eq:ldm_loss}
 \mathcal{L}_{\mathrm{LDM}}
 =
 \mathbb{E}_{x,\epsilon,t}
 \left[
 \left\|
-\epsilon - \epsilon_\theta(z_t, t, \mathbf{e}_p)
+\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{z}_t, t, \mathbf{e}_p)
 \right\|_2^2
 \right],
 \end{equation}
@@ -52,8 +58,10 @@ At inference time, generation starts from Gaussian noise and iteratively denoise
 % Formally, given a prompt distribution $\mathcal{P}_c$ associated with concept $c$, the goal is to reduce the probability that samples from $\mathcal{D}_{\theta'}(\cdot \mid p)$ contain $c$ for $p \sim \mathcal{P}_c$, while preserving generation quality and fidelity on prompts outside this target concept class. \varun{is there prior work on this? add some pointers, or maybe say this is discussed in intro? maybe this should be merged with the next subsection?}
 
 \subsection{Unlearning Methods}
-Machine unlearning in diffusion models aims to remove a target concept $c$ (e.g., \textit{horse}) from a pretrained model $\mathcal{D}_\theta$ while preserving overall generative capabilities. 
-The goal is an updated model $\mathcal{D}_{\hat{\theta}}$ that suppresses $c$ on target-associated prompts while maintaining quality on unrelated prompts, following prior work on concept erasure in diffusion models. 
+Machine unlearning in diffusion models aims to remove a target concept $c$ (e.g., \textit{horse}) from a pretrained model $\mathcal{D}_\theta$(the full text-to-image pipeline parameterized by the U-Net weights $\theta$ from Eq.~\ref{eq:ldm_loss}) 
+% \varun{use a different variable for params, as the params $\theta$ are used for the U-Net?} 
+% \yian{$\theta$ is shared with $\epsilon_\theta$ on purpose as the U-Net is the only trainable component, so $\mathcal{D}_\theta$ and $\epsilon_\theta$ must share parameters. }
+while preserving overall generative capabilities. The goal is an updated model $\mathcal{D}_{\hat{\theta}}$ that suppresses $c$ on target-associated prompts while maintaining quality on unrelated prompts, following prior work on concept erasure in diffusion models. 
 
 \textbf{Fine-tuning methods.}
 A large body of work erase concepts by directly modifying the weights of a pretrained diffusion model. Erased Stable Diffusion (ESD)~\cite{gandikota2023erasing} uses negative guidance to align target-token prompts with a neutral anchor. Subsequent work improves the precision by editing cross-attention representations~\citep{wang2025ace} or updating salient concept-related parameters~\citep{fan2023salun,wu2024scissorhands}. More recent robust methods such as AdvUnlearn~\cite{zhang2024defensive} and STEREO~\cite{srivatsan2025stereo} further defend against prompt-based regeneration attacks.
@@ -62,7 +70,7 @@ However, these methods still largely define erasure through target tokens, promp
 \textbf{Inference-time methods.}
 A complementary line of work avoids modifying $\mathcal{D}_{\theta}$ and instead intervenes during generation by manipulating text embeddings~\citep{li2024get}, inserting lightweight concept-blocking adapters~\citep{lyu2024one}, or ablating sparse-autoencoder features~\citep{cywinski2025saeuron}. These methods are computationally efficient and often preserve broad model behavior, but their conservative, localized interventions do not remove the distributed contextual pathways through which a target concept can be recovered. As a result, they tend to preserve neighboring concepts better, while leaving residual indirect recovery.
 
-\paragraph{Shared limitation.}
+\noindent{\bf Shared limitation.}
 Thus, both fine-tuning and inference-time methods implicitly treat concepts as localized and independently suppressible. Our work challenges this assumption: when concepts occupy overlapping activation regions, erasure and retention are coupled, so stronger robustness against leakage necessarily increases the risk of neighbor degradation.
 
 %\ali{we should somehow highlight this last paragraph; readers usually skip the related work sections.}
@@ -74,7 +82,7 @@ Thus, both fine-tuning and inference-time methods implicitly treat concepts as l
 \begin{comment}
     \subsection{Unlearning Methods}
 % \noindent \textbf{The \textsc{UnlearnCanvas} Benchmark}
-% Our experimental framework is built upon the \textsc{UnlearnCanvas} benchmark, a comprehensive dataset recently proposed by~\citet{zhang2024unlearncanvas} to standardize the evaluation of diffusion model unlearning. It was created to address the lack of rigorous, automated evaluation frameworks, which previously relied on ad-hoc, qualitative assessments. The benchmark consists of a high-resolution, stylized image dataset featuring 60 distinct artistic styles and 20 distinct object classes. Its primary advantage lies in its high stylistic consistency, which enables the training of a highly accurate style classifier, allowing for the reliable, quantitative measurement of unlearning using standardized metrics like Unlearning Accuracy (UA), In-domain Retain Accuracy (IRA), and Cross-domain Retain Accuracy (CRA). While \textsc{UnlearnCanvas} provides the essential visual data for our investigation, it does not include a formal, art style hierarchy linking its 60 styles. The styles are presented as a flat list. A foundational part of our methodology, therefore, is to construct this missing knowledge graph, which serves as the basis for our directional unlearning experiments.
+% Our experimental framework is built upon the \textsc{UnlearnCanvas} benchmark, a comprehensive dataset recently proposed by~\citet{zhang2024unlearncanvas} to standardize the evaluation of diffusion model unlearning. It was created to address the lack of rigorous, automated evaluation frameworks, which previously relied on ad-hoc, qualitative assessments. The benchmark consists of a high-resolution, stylized image dataset featuring 65 distinct artistic styles and 20 distinct object classes. Its primary advantage lies in its high stylistic consistency, which enables the training of a highly accurate style classifier, allowing for the reliable, quantitative measurement of unlearning using standardized metrics like Unlearning Accuracy (UA), In-domain Retain Accuracy (IRA), and Cross-domain Retain Accuracy (CRA). While \textsc{UnlearnCanvas} provides the essential visual data for our investigation, it does not include a formal, art style hierarchy linking its 60 styles. The styles are presented as a flat list. A foundational part of our methodology, therefore, is to construct this missing knowledge graph, which serves as the basis for our directional unlearning experiments.
 
 \noindent \textbf{Methods for Diffusion Model Unlearning}
 The primary objective of Machine Unlearning (MU) in diffusion models is to erase a target concept while minimizing collateral damage to the model's remaining generative capabilities. Current approaches can be broadly classified into two main categories:

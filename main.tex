@@ -1,6 +1,6 @@
 \documentclass{article}
 
-% Recommended, but optional, packages for figures and better typesetting:
+% Recommended, but optional, packages for figures and better typesetting:p
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{subfigure}
@@ -84,7 +84,7 @@ Concept Entanglement Limits Diffusion Model Unlearning}
 % \commentsfalse     % hide comments (e.g., for submission)
 
 
-\newcommand{\ali}[1]{\textcolor{olive}{[ali: #1]}}
+\newcommand{\ali}[1]{\textcolor{orange}{[ali: #1]}}
 \newcommand{\varun}[1]{\textcolor{red}{[Varun: #1]}}
 \newcommand{\yian}[1]{\textcolor{blue}{[yian: #1]}}
 \newcommand{\hs}[1]{\textcolor{violet}{[hari: #1]}}
@@ -104,8 +104,6 @@ Anonymous Authors
 \input{sections/02Related}
 \input{sections/03Motivation}
 \input{sections/04Proof}
-% \input{sections/04ProblemFormulation}
-% \input{sections/04Method}
 \input{sections/05Experiment}
 \input{sections/06Discussion}
 \input{sections/07Limitation}
@@ -113,5 +111,21 @@ Anonymous Authors
 \bibliography{references}   % or whatever your .bib filename is
 \bibliographystyle{plainnat}
 \newpage
-\input{sections/08Appendix}
+\appendix
+{\large \begin{center} {\bf Appendix} \end{center}}
+\input{sections/app/01}
+\input{sections/app/02}
+\input{sections/app/03}
+\input{sections/app/04}
+\input{sections/app/05}
+\input{sections/app/06}
+\input{sections/app/07}
+\input{sections/app/08}
+\input{sections/app/09}
+\input{sections/app/10}
+\input{sections/app/11}
+\input{sections/app/rebuttal}
+\newpage
+\input{checklist.tex}
+
 \end{document}
