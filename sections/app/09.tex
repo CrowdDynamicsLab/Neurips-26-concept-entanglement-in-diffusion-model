@@ -64,7 +64,6 @@ These metrics measure how effectively the target concept $c$ is suppressed in th
 We measure retention at three levels of granularity:
 \begin{itemize}
     \item \emph{In-domain Retain Accuracy (IRA)}: The fraction of images generated from indirect prompts by $\mathcal{D}_{\hat\theta}$ that are classified as a non-target, non-neighbor, non-control concept in the vocabulary. This captures the tendency of an unlearned model to substitute unrelated concepts when indirectly prompted for the erased target.
-    % TODO(author): name the prompt set IRA uses (it is not computed on the indirect recovery prompts used for IRR) and reword this bullet
     %\ali{are we using this metric only for the UnlearnCanvas dataset? if not, this part is confusing and not needed.
     \item \emph{Neighbor Preservation (NP)}: This is our primary trade-off metric. The overlap with remaining concepts is often dominated by the overlap with a few concepts which are mostly semantically similar with the target concept. Therefore, as a proxy metric for utility preservation, we evaluate utility preservation in the semantic neighborhood $\mathcal{N}(c)$ of the target concept (\cref{def:semantic_neighborhood}) and define
     \begin{equation}
