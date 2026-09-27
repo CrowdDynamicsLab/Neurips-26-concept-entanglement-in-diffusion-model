@@ -117,13 +117,14 @@ Controls  & \texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyf
 \end{table}
 
 \subsection{Classifier reliability}\label{app:classifier}
-We evaluate the fixed CLIP classifier on labeled images of the five targets and
-report per-concept true-positive and false-positive rates
-(Table~\ref{tab:clf}). The classifier attains a micro-averaged TPR of $97.0\%$
+We evaluate the fixed CLIP classifier on 100 labeled images per target (500 in
+total) and report per-concept true-positive and false-positive rates
+(Table~\ref{tab:clf}). Scoring is one-vs-rest among the five targets: for each
+target, its 100 images are the positives and the 400 images of the other four
+targets are the negatives, so TPR is out of 100 and FPR is out of 400. The classifier attains a micro-averaged TPR of $97.0\%$
 and FPR of $0.55\%$, ranging from $90\%$ TPR for \texttt{dog} to $1.25\%$ FPR
 for \texttt{horse}. All methods share the same classifier, vocabulary, prompts,
 and decision rule, so classifier error does not differ across methods.
-% TODO(author): source and size of the labeled image set
 
 \begin{table}[h]\centering\small
 \caption{CLIP classifier reliability on labeled images.}\label{tab:clf}
