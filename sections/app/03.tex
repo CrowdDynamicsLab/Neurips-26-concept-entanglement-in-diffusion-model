@@ -9,7 +9,7 @@ The centroid-distance matrix used to motivate neighborhood structure in~\cref{se
 
 
 \paragraph{On the relationship between cosine and $\ell_2$ metrics.}
-\Cref{thm:tradeoff} bounds the $\ell_2$ displacement $\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_{\theta}(p)\|_2$, since this quantity measures a physical perturbation to the activation vector. Our $\kappa$ estimator, in contrast, uses cosine distance to characterize region membership. These two choices are compatible: for activations normalized to the unit sphere, $\|\mathbf{a} - \mathbf{b}\|_2^2 = 2 \cdot d_{\cos}(\mathbf{a}, \mathbf{b})$, so an $L$-Lipschitz function under the $\ell_2$ metric is $(L\sqrt{2})$-Lipschitz under cosine distance, and~\cref{asm:lip} transfers directly (with a constant factor absorbed into $L$). 
+\Cref{thm:tradeoff} bounds the $\ell_2$ displacement $\|\boldsymbol{\Phi}_{\hat\theta}(p) - \boldsymbol{\Phi}_{\theta}(p)\|_2$, since this quantity measures a physical perturbation to the activation vector. Our $\kappa$ estimator, in contrast, uses cosine distance to characterize region membership. These two choices are compatible: for activations normalized to the unit sphere, $\|\mathbf{a} - \mathbf{b}\|_2^2 = 2 \cdot d_{\cos}(\mathbf{a}, \mathbf{b})$, so an $L$-Lipschitz function under the $\ell_2$ metric satisfies $|f(a)-f(b)|\le L\sqrt{2\,d_{\cos}(a,b)}$ on the unit sphere, i.e., it is H\"older continuous with exponent $1/2$ in cosine distance. The theorem is stated and proved entirely in $\ell_2$; cosine distance is used only to decide region membership in the estimator, and since both metrics induce the same fattened regions up to a monotone re-parameterization of $\rho$, this choice does not affect the bound. 
 
 \paragraph{Activation extraction.}
 For each concept $c$, we generate images from 50 shared prompt templates (differing only in the concept word) using the base model (Stable Diffusion v1.4) with DDIM sampling (50 steps, guidance scale 7.5). At step $t^*{=}25$, we extract the cross-attention output at \texttt{mid\_block.attentions.0}, take the text-conditioned component, and mean-pool over spatial dimensions to obtain a single activation vector $\boldsymbol{\Phi}_\theta(p) \in \mathbb{R}^d$ per prompt. 
@@ -46,7 +46,7 @@ This choice calibrates the overlap radius to the natural spread of the target co
 To independently verify that the neighborhoods discovered in the previous step reflect genuine semantic structure rather than noise, we visualize the pairwise centroid cosine distances between all ten concept activation regions. \Cref{fig:distance_matrix} shows the resulting distance matrix, reordered by hierarchical clustering on the centroid distances themselves. Two block structures are immediately visible. The equine cluster (\texttt{horse}$\leftrightarrow$\texttt{pony}: $0.158$; \texttt{horse}$\leftrightarrow$\texttt{donkey}: $0.329$; \texttt{pony}$\leftrightarrow$\texttt{donkey}: $0.271$) 
 exhibit small inter-concept distances, 
 consistent with the high $\hat\kappa$ values reported in~\cref{tab:kappa}. 
-And semantically isolated concepts such as \texttt{castle} have centroid distances exceeding $0.65$ to all animal concepts, consistent with $\hat\kappa \approx 0$.
+And semantically isolated concepts such as \texttt{castle} have centroid distances exceeding $0.65$ to all animal concepts, consistent with castle's low $\hat\kappa$.
 
 \begin{figure}[htbp]
 \centering
@@ -107,12 +107,15 @@ We apply the procedure of~\cref{app:kappa_estimation} to the five target concept
 For \texttt{horse}, the per-neighbor coverage of target samples (fraction of $\mathcal{S}_{\texttt{horse}}$ with a within-$\rho$ activation in the neighbor's sample set) decomposes as: \texttt{mare} ($0.78$), \texttt{pony} ($0.72$), \texttt{stallion} ($0.66$), \texttt{donkey} ($0.41$), \texttt{foal} ($0.38$), \texttt{zebra} ($0.30$), \texttt{mule} ($0.22$), with the union saturating at $\hat\kappa = 0.81$. 
 The strongest individual neighbors (\texttt{mare}, \texttt{pony}) already cover most of the target region on their own, and several others contribute substantially, indicating that overlap is supported by a representational manifold shared across the equine subtype family rather than being sensitive to which specific neighbor is picked. By contrast, \texttt{castle}'s six discovered neighbors each cover only $0.05$--$0.12$ of the target region, and their union saturates at $\hat\kappa = 0.27$, consistent with castle's neighbors representing distinct architectural types rather than fine-grained subtypes of a shared category.
 
+\paragraph{Sensitivity to the neighborhood.}\label{app:kappa-ablation} For fixed target samples and radius, $\mathcal N_1\subseteq\mathcal N_2$ implies $\hat\kappa(c;\mathcal N_1)\le\hat\kappa(c;\mathcal N_2)$, but a new neighbor raises $\hat\kappa$ only if it covers target samples not already covered. Adding neighbors to \texttt{horse} in order of centroid distance, \texttt{mare} alone gives $\hat\kappa=0.78$, adding \texttt{pony} gives $0.81$, and the remaining five neighbors leave it unchanged. Varying the percentile that defines the discovery threshold from the 10th to the 50th changes $|\mathcal N(\texttt{horse})|$ from 3 to 9 and $|\mathcal N(\texttt{castle})|$ from 1 to 9, while $\hat\kappa$ stays at $0.81$ and $0.27$. $\hat\kappa$ therefore reflects union coverage of the target region rather than neighborhood cardinality.
+% TODO(author): per-neighbor marginal and cumulative coverage for dog, bear, cat (only horse and castle exist)
+
  
 
 \subsection{Sensitivity of $\hat\kappa$ to the choice of probe layer}
 \label{app:layer_sensitivity}
 
-The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block.attentions.0}$. To assess whether the bimodal $\hat\kappa$ structure reported in~\cref{tab:kappa} is an artifact of this choice, we re-ran the estimator at four additional cross-attention layers spanning the U-Net depth, holding all other estimator hyperparameters (candidate pool $\mathcal{C}_{\text{pool}}$, $\delta$-threshold percentile, fattening radius rule, prompt templates, timestep $t^*=25$) fixed.
+The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block.attentions.0}$. To assess whether the bimodal $\hat\kappa$ structure reported in~\cref{tab:kappa} is an artifact of this choice, we re-ran the estimator at five additional cross-attention layers spanning the U-Net depth, holding all other estimator hyperparameters (candidate pool $\mathcal{C}_{\text{pool}}$, $\delta$-threshold percentile, fattening radius rule, prompt templates, timestep $t^*=25$) fixed.
 
 \begin{table}[ht]
 \centering
@@ -120,9 +123,9 @@ The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block
 \setlength{\tabcolsep}{2pt}
 \begin{tabular}{lccccc|cc}
 \toprule
-\textbf{Layer} & \texttt{castle} & \texttt{cat} & \texttt{horse} & \texttt{bear} & \texttt{dog} & Spearman $\rho$ vs.\ mid & Animal std \\
+\textbf{Layer} & \texttt{castle} & \texttt{cat} & \texttt{horse} & \texttt{bear} & \texttt{dog} & $\rs$ vs.\ mid & Animal std \\
 \midrule
-\texttt{down\_blocks.2.attentions.0} & 0.34 & 0.77 & 0.86 & 0.92 & 0.92 & $+0.90$ & 0.094 \\
+\texttt{down\_blocks.2.attentions.0} & 0.34 & 0.77 & 0.86 & 0.92 & 0.92 & $+0.97$ & 0.061 \\
 \texttt{down\_blocks.2.attentions.1} & 0.26 & 0.71 & 0.74 & 0.87 & 0.85 & $+0.90$ & 0.069 \\
 \textbf{\texttt{mid\_block.attentions.0}} & \textbf{0.27} & \textbf{0.77} & \textbf{0.81} & \textbf{0.82} & \textbf{0.89} & --- & \textbf{0.043} \\
 \texttt{up\_blocks.1.attentions.0} & 0.09 & 0.59 & 0.48 & 0.88 & 0.79 & $+0.80$ & 0.158 \\
@@ -130,10 +133,45 @@ The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block
 \texttt{up\_blocks.2.attentions.0} & 0.00 & 0.78 & 0.63 & 0.89 & 0.88 & $+0.80$ & 0.105 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{$\hat\kappa$ across six candidate probe layers.} All four alternative layers produce a $\hat\kappa$ ranking strongly consistent with mid-block (Spearman $\rho \geq 0.80$). Mid-block additionally yields the tightest cluster of animal-subtype $\hat\kappa$ values (std $=0.043$, vs.\ $0.069$--$0.203$ elsewhere), making it the layer at which the ``animal-subtype shared-manifold'' structure is most coherently expressed.}
+\caption{\textbf{$\hat\kappa$ across six candidate probe layers.} All five alternative layers produce a $\hat\kappa$ ranking strongly consistent with mid-block ($\rs \geq 0.80$). Mid-block additionally yields the tightest cluster of animal-subtype $\hat\kappa$ values (std $=0.043$, vs.\ 0.061 to 0.203 elsewhere), making it the layer at which the ``animal-subtype shared-manifold'' structure is most coherently expressed.}
 \label{tab:layer_sensitivity}
 \end{table}
 
-\paragraph{Conclusion.} Three observations support our default choice. First, the $\hat\kappa$ \emph{ranking} of the five target concepts is stable across all probed layers (Spearman $\rho \geq 0.80$ vs.\ mid-block in every case): the ordering $\hat\kappa(\texttt{castle}) \ll \hat\kappa(\{\texttt{cat}, \texttt{horse}, \texttt{bear}, \texttt{dog}\})$ is a property of the underlying concept geometry, not of mid-block specifically. Second, mid-block produces the cleanest bimodal separation between high-entanglement animal subtypes and the low-entanglement architectural concept: the smallest animal $\hat\kappa$ exceeds $\hat\kappa(\texttt{castle})$ by $0.50$ at mid-block, vs.\ $0.39$--$0.45$ at down-block / up-block-1.0 and an inverted ordering at up-block-1.1 where $\hat\kappa(\texttt{castle}) = 0.39 > \hat\kappa(\texttt{cat}) = 0.36$. Third, mid-block has the lowest within-cluster spread among the four animal concepts (std $0.043$, less than half that of every up-block layer), consistent with mid-block being the layer at which fine-grained subtypes are most coherently represented as overlapping regions of a shared manifold. We therefore use mid-block as the default probe for $\hat\kappa$ estimation, the visualization in~\cref{fig:umap}, the Lipschitz checks in~\cref{app:lipschitz}, and the within-target displacement validation in~\cref{app:displacement}.
+\paragraph{Conclusion.} Three observations support our default choice. First, the $\hat\kappa$ \emph{ranking} of the five target concepts is stable across all probed layers ($\rs \geq 0.80$ vs.\ mid-block in every case): the ordering $\hat\kappa(\texttt{castle}) \ll \hat\kappa(\{\texttt{cat}, \texttt{horse}, \texttt{bear}, \texttt{dog}\})$ is a property of the underlying concept geometry, not of mid-block specifically. Second, mid-block produces the cleanest bimodal separation between high-entanglement animal subtypes and the low-entanglement architectural concept: the smallest animal $\hat\kappa$ exceeds $\hat\kappa(\texttt{castle})$ by $0.50$ at mid-block, vs.\ $0.39$--$0.45$ at down-block / up-block-1.0 and an inverted ordering at up-block-1.1 where $\hat\kappa(\texttt{castle}) = 0.39 > \hat\kappa(\texttt{cat}) = 0.36$. Third, mid-block has the lowest within-cluster spread among the four animal concepts (std $0.043$, less than half that of every up-block layer), consistent with mid-block being the layer at which fine-grained subtypes are most coherently represented as overlapping regions of a shared manifold. We therefore use mid-block as the default probe for $\hat\kappa$ estimation, the visualization in~\cref{fig:umap}, the Lipschitz checks in~\cref{app:lipschitz}, and the within-target displacement validation in~\cref{app:displacement}.
 
-\paragraph{A note on \texttt{up\_blocks.1.attentions.1}.} The direct displacement measurements in~\cref{app:displacement_kappa} are reported at \texttt{up\_blocks.1.attentions.1} rather than mid-block. The $\hat\kappa$ ranking at this layer agrees with mid-block (Spearman $\rho = 0.80$, supporting the cross-target $\hat\kappa$-scaling reported there), but its bimodal separation is the weakest of the five layers. We use this up-block layer for direct displacement specifically because it lies downstream of the cross-attention edits applied by fine-tuning methods and therefore exhibits the largest absolute displacement signal under STEREO and AdvUnlearn; the $\kappa$-scaling claim in~\cref{app:displacement_kappa} relies on the Spearman ranking, which is preserved, not on the absolute $\hat\kappa$ values at that layer.
+\paragraph{A note on \texttt{up\_blocks.1.attentions.1}.} The direct displacement measurements in~\cref{app:displacement_kappa} are reported at \texttt{up\_blocks.1.attentions.1} rather than mid-block. The $\hat\kappa$ ranking at this layer agrees with mid-block ($\rs = 0.80$, supporting the cross-target $\hat\kappa$-scaling reported there), but its bimodal separation is the weakest of the five layers. We use this up-block layer for direct displacement specifically because it lies downstream of the cross-attention edits applied by fine-tuning methods and therefore exhibits the largest absolute displacement signal under STEREO and AdvUnlearn; the $\kappa$-scaling claim in~\cref{app:displacement_kappa} relies on the Spearman ranking, which is preserved, not on the absolute $\hat\kappa$ values at that layer.
+
+\paragraph{Sensitivity to the denoising timestep.} Step $t^*=25$ was chosen a
+priori as the midpoint of the 50-step DDIM trajectory. Table~\ref{tab:timestep}
+recomputes $\hat\kappa$ at steps 10, 25, and 40 with identical prompts and
+seeds. Relative to step 25, the concept ranking has $\rs=0.93$ at step 10 and
+$0.96$ at step 40, with mean neighbor-set Jaccard agreement of $0.98$ and $0.82$.
+The ranking is stable, although absolute estimates vary, most notably for
+\texttt{castle} at step 10.
+
+\begin{table}[h]\centering\small
+\caption{$\hat\kappa$ at three denoising steps (\texttt{mid\_block.attentions.0}).}
+\label{tab:timestep}
+\begin{tabular}{lccc}\toprule
+Concept & Step 10 & Step 25 & Step 40\\\midrule
+\texttt{castle} & 0.77 & 0.27 & 0.20\\
+\texttt{cat} & 0.81 & 0.77 & 0.74\\
+\texttt{horse} & 0.80 & 0.81 & 0.84\\
+\texttt{bear} & 0.81 & 0.82 & 0.81\\
+\texttt{dog} & 0.95 & 0.89 & 0.86\\
+\texttt{sunglasses} & 0.99 & 0.99 & 0.99\\
+\texttt{eye} & 0.99 & 0.97 & 0.97\\\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Small and localized concepts.} To test whether mean-pooled
+mid-block activations capture concepts occupying small image regions, we add
+\texttt{sunglasses} and \texttt{eye} and probe cross-attention layers at
+$8\times8$, $16\times16$, $32\times32$, and $64\times64$ resolution. At step 25,
+\texttt{sunglasses} obtains $\hat\kappa=0.99$, $0.88$, $0.99$, $0.97$ and
+\texttt{eye} obtains $0.97$, $0.86$, $0.94$, $0.94$. Discovered neighborhoods
+remain semantic (\texttt{sunglasses}: \texttt{eyeglasses}, \texttt{goggles},
+\texttt{shades}, \texttt{spectacles}; \texttt{eye}: \texttt{eyeball},
+\texttt{eyelid}, \texttt{iris}, \texttt{pupil}) and no control is selected. The
+estimator thus detects entanglement for localized concepts, while the exact
+value of $\hat\kappa$ remains probe-dependent.

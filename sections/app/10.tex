@@ -1,7 +1,9 @@
 \section{Per-Concept Results}
 \label{app:per_concept_tables}
 
-This appendix provides the per-concept evaluation tables underlying the averaged results in \Cref{tab:main_results_avg}. For each of the five target concepts, we report all metrics across the seven unlearning methods. The concepts span estimated entanglement coefficients $\hat\kappa \in [0.27, 0.89]$ (\Cref{tab:kappa}), enabling the $\kappa$-scaling analysis in \Cref{subsec:kappa_scaling}.
+This appendix provides the per-concept evaluation tables underlying the averaged results in \Cref{tab:main_results_avg}. For each of the five target concepts, we report all metrics across all evaluated methods.
+% TODO(author): per-concept rows for UCE, RECE, CPE, TRUST, SLD, SAFREE in Tables 5 to 9
+The concepts span estimated entanglement coefficients $\hat\kappa \in [0.27, 0.89]$ (\Cref{tab:kappa}), enabling the $\kappa$-scaling analysis in \Cref{subsec:kappa_scaling}.
 
 We order tables by $\hat\kappa$ in descending order to make the predicted scaling visually apparent: collateral damage (low IRA, low NP, high DamageGap) is most pronounced for high-$\hat\kappa$ concepts and attenuates as $\hat\kappa$ decreases.
 
@@ -147,7 +149,7 @@ SAeUron     & Inf.        & 72.0  & 37.5  & 60.25 & 85.63 & 96.0  & 10.37 \\
 \end{table}
 
 \paragraph{Observations.}
-\texttt{Cat} exhibits a trade-off structure consistent with the high-$\hat\kappa$ regime, though its base IRA = $85.50$ is the highest of the five concepts, providing more retention "headroom" than other targets. STEREO again occupies the high-erasure / catastrophic-retention extreme (UA = $93$, NP = $27.60$, IRA = $27.68$), with DamageGap = $62.40$ matching its damage on horse and bear. AdvUnlearn achieves complete erasure (UA = $100$, IRR = $0$) at NP = $72.40$, demonstrating that adversarial training can preserve neighbors more effectively than STEREO at comparable erasure strength. ESD achieves a notable operating point: UA = $66$ at NP = $87.35$ with DamageGap = $0.80$, the cleanest standard-FT result on any concept in our evaluation, though at the cost of higher residual leakage (IRR = $38$). The STEREO IRA-retention ratio for cat ($27.68 / 85.50 = 0.32$) is consistent with the corresponding ratio on horse ($0.29$) and bear ($0.25$), reinforcing the $\hat\kappa$-scaling result in~\Cref{subsec:kappa_scaling}.
+\texttt{Cat} exhibits a trade-off structure consistent with the high-$\hat\kappa$ regime, though its base IRA = $85.50$ is the highest of the five concepts, providing more retention "headroom" than other targets. STEREO again occupies the high-erasure / catastrophic-retention extreme (UA = $93$, NP = $27.60$, IRA = $27.68$), with DamageGap = $62.40$ matching its damage on horse and bear. AdvUnlearn achieves complete erasure (UA = $100$, IRR = $0$) at NP = $72.40$, demonstrating that adversarial training can preserve neighbors more effectively than STEREO at comparable erasure strength. ESD preserves neighbors well (NP $=87.35$, DamageGap $=10.65$) but achieves the weakest erasure on this concept (UA $=66$, IRR $=38$). The STEREO IRA-retention ratio for cat ($27.68 / 85.50 = 0.32$) is consistent with the corresponding ratio on horse ($0.29$) and bear ($0.25$), reinforcing the $\hat\kappa$-scaling result in~\Cref{subsec:kappa_scaling}.
 \subsection{Castle}
 \label{app:per_concept_castle}
 
@@ -185,6 +187,8 @@ SAeUron     & Inf.        & --    & --    & --    & --    & --    & --    \\
 \subsection{Additional Target Concepts}
 \label{app:additional_concepts}
 To extend the five-target analysis in the main text, we evaluate \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car}. Their estimated entanglement coefficients span $\hat\kappa \in [0.37, 0.83]$, adding concepts between the low-overlap \texttt{castle} and the densely overlapping animal subtypes. \Cref{tab:new_concept_results} reports the unedited reference and results for EDiff, ESD, SalUn, and STEREO using the metrics defined in~\cref{sec:experiment}.
+Averaged over the four methods, NP is $65.0$, $62.0$, $61.7$, $61.3$, and $58.8$ for \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car}, decreasing monotonically with $\hat\kappa$ ($\rs=-1.0$). Within-method correlations are $-0.4$ (EDiff), $-0.7$ (ESD), $-0.2$ (SalUn), and $-0.7$ (STEREO). STEREO again sits at the aggressive end, reaching UA $\geq 99.1$ on every new target with NP between $16.0$ and $26.6$.
+% TODO(author): discovered neighbor sets and classification vocabulary for the five new targets
 \begin{table*}[htbp]
 \centering
 \caption{Results for the five additional target concepts. Original denotes the pretrained model before unlearning. All evaluation metrics are percentages. Higher UA, IRA, NP, and CP are better; lower IRR and DamageGap are better. DamageGap is the difference between control preservation (CP) and neighbor preservation (NP).}

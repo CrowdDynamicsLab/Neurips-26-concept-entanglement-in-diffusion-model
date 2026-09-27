@@ -1,0 +1,41 @@
+\section{Cross-Architecture Experiments}\label{app:arch}
+
+\paragraph{SDXL.} SDXL shares the cross-attention structure of SD v1.4, so
+$\hat\kappa$ is directly computable. Table~\ref{tab:sdxl} reports ESD under the
+same erasure and evaluation protocol for three concepts.
+% TODO(author): SDXL cross-attention UMAP figure (referenced in the aFr7 response)
+
+\begin{table}[h]\centering\small
+\caption{ESD on SDXL. NP decreases monotonically with $\hat\kappa_{\text{SDXL}}$.}
+\label{tab:sdxl}
+\begin{tabular}{lcccc}\toprule
+Concept & $\hat\kappa_{\text{SDXL}}$ & UA $\uparrow$ & NP $\uparrow$ & DamageGap $\downarrow$\\\midrule
+\texttt{cat} & 0.65 & 99 & 90.9 & 9.1\\
+\texttt{castle} & 0.72 & 91 & 85.0 & 15.0\\
+\texttt{dog} & 0.92 & 77 & 77.1 & 22.9\\\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{FLUX (MMDiT with T5).} FLUX uses joint text-image attention and has
+no cross-attention block analogous to \texttt{mid\_block.attentions.0}. A proxy
+$\kappa$ estimated from the joint-attention denoiser saturates near $1$ for all
+targets (\texttt{dog} $1.00$, \texttt{cat} $0.97$, \texttt{castle} $0.97$) and
+also for two unrelated controls (\texttt{airplane}$\to$\texttt{teapot} $0.99$,
+bootstrap 95\% CI $[0.94,1.00]$; \texttt{teapot}$\to$\texttt{airplane} $1.00$,
+CI $[0.95,1.00]$; centroid distance $0.011$). The proxy therefore does not
+resolve concept structure at the layers we can access, and we treat
+$\kappa$-scaling on MMDiT as untested. Table~\ref{tab:flux} nonetheless shows
+that erasure produces neighbor-selective damage: NP collapses while unrelated
+controls are preserved.
+
+\begin{table}[h]\centering\small
+\caption{ESD on FLUX (percent).}\label{tab:flux}
+\begin{tabular}{lccccc}\toprule
+Concept & UA $\uparrow$ & IRR $\downarrow$ & NP $\uparrow$ & CP $\uparrow$ & DamageGap $\downarrow$\\\midrule
+Base (\texttt{dog}) & 8.2 & 26.5 & 100.0 & 100.0 & 0.0\\
+\texttt{dog} & 78.0 & 8.5 & 35.6 & 96.9 & 61.3\\
+\texttt{cat} & 83.0 & & 37.8 & 95.3 & 57.6\\
+\texttt{castle} & 85.0 & & 40.5 & 98.9 & 58.3\\\bottomrule
+\end{tabular}
+% TODO(author): IRR for cat and castle on FLUX
+\end{table}

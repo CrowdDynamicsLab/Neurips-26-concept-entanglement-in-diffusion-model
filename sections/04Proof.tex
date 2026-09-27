@@ -68,7 +68,9 @@ This formulation aggregates overlap across all concepts. In practice, however, t
 % \Cref{tab:kappa} reports the estimated lower-bound for entanglement coefficient $\hat\kappa$ for five target concepts. \varun{what is $\hat\kappa$? not defined}
 Each $\hat\kappa(c_u)$ is computed as the fraction of activation samples from $c_u$ that lie within a fattening radius $\rho_{c_u}$ of any activation from a discovered neighbor concept; the full estimation procedure, choice of $\rho_{c_u}$, and per-target results are detailed in~\cref{app:kappa_per_target}.
 The four animal subtypes (\texttt{dog}, \texttt{bear}, \texttt{horse}, \texttt{cat}) exhibit substantial overlap with fine-grained variants (e.g., \texttt{donkey}, \texttt{mare} for \texttt{horse}), while \texttt{castle} exhibits significantly lower overlap. % despite having semantically related concepts. 
-This heterogeneity in $\hat\kappa$ defines the regime in which~\Cref{thm:tradeoff} predicts collateral damage should scale: erasing a high-$\hat\kappa$ concept incurs substantially larger preservation error than erasing a low-$\hat\kappa$ one. We validate this hypothesis in~\cref{subsec:kappa_scaling}. 
+This heterogeneity in $\hat\kappa$ defines the regime in which~\Cref{thm:tradeoff} predicts collateral damage should scale: erasing a high-$\hat\kappa$ concept incurs substantially larger preservation error than erasing a low-$\hat\kappa$ one. We validate this hypothesis in~\cref{subsec:kappa_scaling}.
+
+\paragraph{Neighborhood construction.} Neighbors are discovered automatically in the original activation space in two stages. For each target $c_u$ we extract activations for ten semantically plausible candidates and three unrelated controls, and keep as neighbors $\mathcal{N}(c_u)$ the candidates whose centroid cosine distance to $c_u$ falls below the 25th percentile of pairwise centroid distances in that pool (Definition~\ref{def:semantic_neighborhood}); the controls must fall outside $\mathcal{N}(c_u)$. $\hat\kappa$ is then computed from sample-level coverage, not from centroids: it is the fraction of target samples lying within the target's median intra-concept distance $\rho_{c_u}$ of some neighbor sample. Because $\hat\kappa$ measures union coverage, enlarging $\mathcal{N}(c_u)$ can only weakly increase it, but cardinality does not determine it: \texttt{horse} and \texttt{castle} have seven and six neighbors yet $\hat\kappa=0.81$ and $0.27$. The estimate is also stable in practice: for \texttt{horse}, \texttt{mare} alone gives $0.78$ and adding \texttt{pony} gives $0.81$, after which five further neighbors change nothing; moving the percentile threshold from the 10th to the 50th changes $|\mathcal{N}|$ from 3 to 9 for \texttt{horse} and from 1 to 9 for \texttt{castle} while leaving $\hat\kappa$ at $0.81$ and $0.27$ (Appendix~\ref{app:kappa-ablation}).
 %Estimation details and sensitivity analyses are in~\cref{app:kappa_estimation}.
 
 We now define the two desiderata that any unlearning method must satisfy:
@@ -115,25 +117,26 @@ The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-concept preservation}
 In this section, we show that $\varepsilon$-robust unlearning and $\gamma$-concept preservation are fundamentally in tension.
 We begin by stating two mild regularity assumptions that formalize how perturbations in activation space affect generation.
 
-\begin{assumption}[Lipschitz continuity of generation]
-\label{asm:lip}
-Let $\mathcal{H} = \mathbb{R}^{d_{\ell^*}}$ denote the cross-attention activation space at layer $\ell^*$.
-For each concept $c \in \mathcal{C}$, the generation probability is Lipschitz continuous with respect to activations:
+\begin{assumption}[Lipschitz continuity of generation]\label{asm:lip}
+For a model $\theta'$ and prompt $p$, let
+$g_c(\theta',p)=\Pr_{x\sim p_{\theta'}(\cdot\mid p)}[\mathbb{O}_{\mathcal{X}}(x,c)=1]$.
+For each concept $c\in\mathcal{C}$ there is a constant $L$ such that, for all
+prompts $p,p'\in\mathcal{P}$ and all $\theta',\theta''\in\{\theta,\hat\theta\}$,
 \begin{equation}
-    \left|
-    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\mathbf{h}},c)=1]
-    -
-    \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\mathbf{h}'},c)=1]
-    \right|
-    \leq
-    L\|\mathbf{h}-\mathbf{h}'\|_2,
-    \quad \forall \mathbf{h}, \mathbf{h}' \in \mathcal{H}.
+  \bigl|g_c(\theta',p)-g_c(\theta'',p')\bigr|
+  \le L\,\bigl\|\boldsymbol{\Phi}_{\theta'}(p)-\boldsymbol{\Phi}_{\theta''}(p')\bigr\|_2 .
 \end{equation}
-
-where $\mathbf{x}_{\mathbf{h}} \sim p_\theta(\cdot \mid \boldsymbol{\Phi}_\theta^{-1}(\mathbf{h}))$
-denotes an image generated from an activation vector $\mathbf{h}$.
-
 \end{assumption}
+\noindent\emph{Interpretation.} A single probe layer is not injective, and in a
+U-Net the decoder also receives encoder activations through skip connections, so
+we do not treat $\boldsymbol{\Phi}_\theta(p)$ as a sufficient statistic for generation.
+Assumption~\ref{asm:lip} is a smoothness condition along prompt- and
+model-dependent quantities: $L$ is an effective constant of the full network
+that absorbs changes in the probe activation, the skip activations, and other
+hidden states, rather than a property of the probe layer in isolation.
+Appendix~\ref{app:lipschitz} estimates $L$ for $\theta'=\theta''=\theta$ over
+natural prompt variations; the proof uses the case $\theta'=\theta$,
+$\theta''=\hat\theta$, $p'=p$.
 
 \begin{assumption}[Minimum displacement for erasure]
 \label{asm:edit}
@@ -149,7 +152,7 @@ Any unlearning edit $\theta \mapsto \hat{\theta}$ that achieves $\varepsilon$-ro
     \Delta .
 \end{equation}
 \end{assumption}
-We empirically verify assumption~\ref{asm:lip} across natural prompt variations and assumption~\ref{asm:edit} across five unlearning methods erasing \texttt{horse}; all measured pairs satisfy Lipschitz with a small empirical constant, 
+We empirically verify Assumption~\ref{asm:lip} across natural prompt variations and Assumption~\ref{asm:edit} across six unlearning methods erasing \texttt{horse}, including the gradient-based SalUn and TRUST; all measured pairs satisfy Lipschitz with a small empirical constant, 
 % and displacement propagates to semantic neighbors more than to controls. 
 and displacement propagates to other concepts through shared activation structure.
 Full details are in~\cref{app:lipschitz,app:displacement}.
@@ -190,6 +193,18 @@ Equivalently, when $\kappa(c_u,\rho) > 0$, achieving both $\varepsilon$-robustne
 \begin{proof}[Proof sketch]
 Assumptions~\ref{asm:lip} and~\ref{asm:edit} together force every activation in $\mathcal{R}_{c_u}$ to be displaced by at least $\Delta \geq (1-\varepsilon)/L$ under any $\varepsilon$-robust edit. By Definition~\ref{def:overlap}, a $\kappa(c_u,\rho)$-fraction of $\mathcal{R}_{c_u}^{(\rho)}$ lies in the support of $\mathcal{P}_{-u}$, so this displacement propagates to at least a $\kappa(c_u,\rho)$-fraction of $\mathcal{P}_{-u}$'s mass, yielding $\mathbb{E}_{p\sim\mathcal{P}_{-u}}[\|\Phi_{\hat\theta}(p)-\Phi_\theta(p)\|_2] \geq \kappa(c_u,\rho)(1-\varepsilon)/L$. Definition~\ref{def:neighbor} then gives the bound on $\gamma$. The full proof including the regularity assumption is in Appendix~\ref{app:proof}.
 \end{proof}
+
+\begin{remark}[Scope: any unlearning mechanism]\label{rem:scope}
+Theorem~\ref{thm:tradeoff} makes no assumption about how $\hat\theta$ is
+obtained. $\mathcal{D}_{\hat\theta}$ is any model achieving $\varepsilon$-robust
+unlearning, so the bound applies equally to activation interventions,
+closed-form weight edits, gradient-based fine-tuning such as SalUn and TRUST,
+and inference-time methods, provided the resulting model displaces target
+activations as in Assumption~\ref{asm:edit}. We verify this for
+gradient-based methods in Appendix~\ref{app:displacement}: TRUST, for example,
+displaces target activations by $15.82\pm3.82$, neighbors by $8.82\pm4.88$, and
+controls by only $3.10\pm1.36$.
+\end{remark}
 % \begin{proof}[Proof sketch]
 % By assumption~\ref{asm:lip}, %$\varepsilon$-robust unlearning requires displacing all activations in $\mathcal{R}_{c_u}$ by at least $\Delta = (1-\varepsilon)/L$. This displacement propagates to the fraction $\kappa(c_u,\delta)$ of $\mathcal{R}_{c'}$ that overlaps with $\mathcal{R}_{c_u}^{(\rho)}$, minus at most $\delta$ due to inter-concept distance. 
 % $\varepsilon$-robust unlearning requires displacing all activations in $\mathcal{R}_{c_u}$ by at least $\Delta = (1-\varepsilon)/L$. By Definition~\ref{def:overlap}, a fraction $\kappa(c_u,\rho)$ of the fattened region $\mathcal{R}_{c_u}^{(\rho)}$ overlaps with non-target concept regions. This displacement therefore affects at least a $\kappa(c_u,\rho)$ fraction of the shared activation mass, yielding an aggregate collateral displacement of at least $\kappa(c_u,\rho)\cdot \Delta$.
@@ -221,7 +236,7 @@ under the stated conditions.
 Eq.~\eqref{eq:tradeoff_eps} defines a \emph{feasibility boundary} in the $(\varepsilon, \gamma)$ plane: no method can simultaneously achieve an erasure robustness below $\varepsilon$ and a neighbor preservation error below $\gamma$ unless the pair $(\varepsilon, \gamma)$ lies above the curve
 $\gamma = \kappa \cdot \frac{1-\varepsilon}{L}.$
 Different unlearning methods correspond to different operating points on or above this curve: aggressive methods achieve small $\varepsilon$ at the cost of large $\gamma$, occupying the upper-left of the frontier; conservative methods accept large $\varepsilon$ to maintain small $\gamma$, occupying the lower-right.
-In Section~\ref{sec:experiment}, we verify that the empirically observed operating points across seven methods are consistent with this predicted boundary.
+In Section~\ref{sec:experiment}, we verify that the empirically observed operating points across thirteen methods are consistent with this predicted boundary.
 
 
 % \noindent{\bf Empirical validation.}

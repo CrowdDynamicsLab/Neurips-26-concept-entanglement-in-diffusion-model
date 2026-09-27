@@ -78,9 +78,9 @@ We proceed in three steps.
 \medskip
 \noindent\textbf{Step 1: Required activation displacement for $\varepsilon$-robustness.}
 
-By construction of the activation region $\mathcal{R}_{c_u}$ (\cref{def:activation}), every $\mathbf{h}\in\mathcal{R}_{c_u}$ corresponds to a prompt whose pre-edit generation contains $c_u$, i.e.\ $\Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_\mathbf{h},c_u)=1]=1$. After an $\varepsilon$-robust edit (\cref{def:robust}), this probability drops below $\varepsilon$ at the displaced activation $\boldsymbol{\Phi}_{\hat\theta}(p)$. Applying~\cref{asm:lip} to the pre- and post-edit activations gives, for every $p$ with $\boldsymbol{\Phi}_\theta(p)\in\mathcal{R}_{c_u}$,
+By construction of the activation region $\mathcal{R}_{c_u}$ (\cref{def:activation}), every $\mathbf{h}\in\mathcal{R}_{c_u}$ corresponds to a prompt $p$ whose pre-edit generation contains $c_u$, i.e.\ $g_{c_u}(\theta,p)=1$. After an $\varepsilon$-robust edit (\cref{def:robust}), $g_{c_u}(\hat\theta,p)\le\varepsilon$. Applying~\cref{asm:lip} to the pre- and post-edit activations (with $\theta'=\theta$, $\theta''=\hat\theta$, $p'=p$) gives, for every $p$ with $\boldsymbol{\Phi}_\theta(p)\in\mathcal{R}_{c_u}$,
 \begin{equation}
-    1 - \varepsilon \;\le\; \bigl|\Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\boldsymbol{\Phi}_\theta(p)},c_u)=1] - \Pr[\mathbb{O}_{\mathcal{X}}(\mathbf{x}_{\boldsymbol{\Phi}_{\hat\theta}(p)},c_u)=1]\bigr|
+    1 - \varepsilon \;\le\; \bigl|g_{c_u}(\theta,p) - g_{c_u}(\hat\theta,p)\bigr|
     \;\le\; L\,\|\boldsymbol{\Phi}_{\hat\theta}(p)-\boldsymbol{\Phi}_\theta(p)\|_2.
 \end{equation}
 Combined with~\cref{asm:edit}, this gives a uniform displacement floor on $\mathcal{R}_{c_u}$:

@@ -1,0 +1,34 @@
+\section{Text-Space versus Denoiser Entanglement}\label{app:textspace}
+Our analysis measures entanglement inside the denoising network. To examine
+whether overlap is already present in the text encoder, we apply the same
+estimator, candidate pools, and prompts to text-encoder representations.
+
+\paragraph{T5 (FLUX.1-schnell).} We extract padding-masked, mean-pooled token
+representations from T5 blocks 0, 11, and 23 and from the final encoder output
+for the five targets. At all four layers and for all five targets,
+$\hat\kappa=0$. This is not caused by unrelated concepts entering the
+neighborhoods: no control is selected at any layer, 19 of 20 target-layer
+conditions have positive silhouette scores, and the nearest final-layer
+centroids are semantically appropriate (\texttt{dog}/\texttt{puppy},
+\texttt{cat}/\texttt{kitten}, \texttt{horse}/\texttt{pony},
+\texttt{castle}/\texttt{palace}), yet lie $1.61$ to $2.97\times$ beyond the
+discovery threshold. The same pools and estimator give
+$\hat\kappa=0.27$, $0.77$, $0.81$, $0.82$, $0.89$ in the SD v1.4 denoiser.
+
+\paragraph{CLIP text space versus denoiser within SDXL.} To compare the two
+spaces within one pipeline, we estimate $\hat\kappa$ for a ten-concept set
+spanning several semantic groups in SDXL's CLIP text-embedding space and in its
+denoiser cross-attention space. In CLIP space, nine of ten concepts obtain
+$\hat\kappa=1.0$ with semantically related neighborhoods; only \texttt{castle}
+obtains $0$. The denoiser produces heterogeneous values, including $0.72$ for
+\texttt{horse}, $0.68$ for \texttt{car}, and $0.60$ for \texttt{dog}, with the
+remaining concepts at $0$.
+% TODO(author): full per-concept table for the SDXL CLIP vs denoiser comparison
+
+\paragraph{Interpretation.} Text-space geometry varies across encoders: CLIP
+shows substantial overlap under our estimator, whereas T5 shows none. Neither
+comparison is a controlled variance decomposition (pooling differs between text
+and denoiser features, and the T5 comparison spans model families), so we read
+them as evidence that the source and severity of entanglement depend on both
+the text representation and the denoiser computation, not as proof that one
+encoder is less entangled in general.

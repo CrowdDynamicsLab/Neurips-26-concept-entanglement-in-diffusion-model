@@ -1,6 +1,6 @@
 \section{Evaluation Setup and Metric Definitions}
 \label{app:evaluation_setup}
-This appendix provides the full evaluation protocol summarized in~\cref{subsec:setup}: the prompt construction pipeline for direct, indirect, neighbor, and control evaluation; formal definitions of the seven metrics used in~\cref{sec:experiment}; and the classification vocabulary shared across all experiments.
+This appendix provides the full evaluation protocol summarized in~\cref{subsec:setup}: the prompt construction pipeline for direct, indirect, neighbor, and control evaluation; formal definitions of the six metrics used in~\cref{sec:experiment}; and the classification vocabulary shared across all experiments.
 
 \subsection{Prompt Construction and Scoring Pipeline}
 \label{app:eval_pipeline}
@@ -64,6 +64,7 @@ These metrics measure how effectively the target concept $c$ is suppressed in th
 We measure retention at three levels of granularity:
 \begin{itemize}
     \item \emph{In-domain Retain Accuracy (IRA)}: The fraction of images generated from indirect prompts by $\mathcal{D}_{\hat\theta}$ that are classified as a non-target, non-neighbor, non-control concept in the vocabulary. This captures the tendency of an unlearned model to substitute unrelated concepts when indirectly prompted for the erased target.
+    % TODO(author): name the prompt set IRA uses (it is not computed on the indirect recovery prompts used for IRR) and reword this bullet
     %\ali{are we using this metric only for the UnlearnCanvas dataset? if not, this part is confusing and not needed.
     \item \emph{Neighbor Preservation (NP)}: This is our primary trade-off metric. The overlap with remaining concepts is often dominated by the overlap with a few concepts which are mostly semantically similar with the target concept. Therefore, as a proxy metric for utility preservation, we evaluate utility preservation in the semantic neighborhood $\mathcal{N}(c)$ of the target concept (\cref{def:semantic_neighborhood}) and define
     \begin{equation}
@@ -114,4 +115,26 @@ Controls  & \texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyf
 \end{tabular}
 \caption{The $65$-concept classification vocabulary used for all CLIP-based metric evaluations in~\cref{sec:experiment}. The vocabulary is the union of the five targets, their respective fine-grained subtype candidates spanning four animal category and one architectural category, and ten out-of-domain controls. See~\cref{tab:kappa_per_target} for the per-target subset $\mathcal{N}(c) \subseteq \mathcal{C}_{\mathrm{pool}}$ that survives the $\delta$-filter and forms the averaging set for NP.}
 \label{tab:vocab}
+\end{table}
+
+\subsection{Classifier reliability}\label{app:classifier}
+We evaluate the fixed CLIP classifier on labeled images of the five targets and
+report per-concept true-positive and false-positive rates
+(Table~\ref{tab:clf}). The classifier attains a micro-averaged TPR of $97.0\%$
+and FPR of $0.55\%$, ranging from $90\%$ TPR for \texttt{dog} to $1.25\%$ FPR
+for \texttt{horse}. All methods share the same classifier, vocabulary, prompts,
+and decision rule, so classifier error does not differ across methods.
+% TODO(author): source and size of the labeled image set
+
+\begin{table}[h]\centering\small
+\caption{CLIP classifier reliability on labeled images.}\label{tab:clf}
+\begin{tabular}{lcc}\toprule
+Target & TPR (\%) $\uparrow$ & FPR (\%) $\downarrow$\\\midrule
+\texttt{dog} & 90 & 0.25\\
+\texttt{cat} & 100 & 0.25\\
+\texttt{bear} & 96 & 1.00\\
+\texttt{horse} & 99 & 1.25\\
+\texttt{castle} & 100 & 0.00\\\midrule
+Average & 97.0 & 0.55\\\bottomrule
+\end{tabular}
 \end{table}

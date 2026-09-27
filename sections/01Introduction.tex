@@ -33,17 +33,19 @@ Two failure modes follow from this geometry: \emph{concept leakage}, where the t
 Concept & $\hat\kappa$ & Neighbors \\
 \midrule
 dog    & 0.89 & puppy, labrador \\
-bear   & 0.82 & black bear, grizzly \\
+bear   & 0.82 & grizzly, panda \\
 horse  & 0.81 & donkey, foal, mare \\
-cat    & 0.77 & kitten, panther \\
+cat    & 0.77 & kitten, lynx \\
 castle & 0.27 & fortress, palace, citadel \\
 \bottomrule
 \end{tabular}
 \end{minipage}\hfill
 \begin{minipage}[c]{0.42\linewidth}
 \caption{\textbf{Concepts occupy coherent, partially overlapping regions in activation space.}
-\emph{Top-left:} UMAP projection of cross-attention activations at \texttt{mid\_block.attentions.0} (step 25/50) for 10 concepts in Stable Diffusion v1.4 (visualization pool; full evaluation pool in~\Cref{app:vocab}); each point is one prompt and ellipses show 95\% covariance contours. Semantically related concepts (\texttt{horse}/\texttt{pony}/\texttt{donkey}) cluster together, while isolated concepts (\texttt{castle}) are well-separated.
-\emph{Bottom-left:} Estimated entanglement coefficient $\hat\kappa$ (fraction of the target's activation region shared with semantic neighbors; see~\cref{def:overlap}). The Neighbors column lists representative discovered neighbors; full per-target neighbor sets are reported in~\cref{app:kappa_estimation}. Animal subtypes have high $\hat\kappa$ and dense neighbor sets; \texttt{castle} has low $\hat\kappa$ despite a comparable number of architectural neighbors.}
+\emph{Top-left:} UMAP projection of cross-attention activations at \texttt{mid\_block.attentions.0} (step 25/50) for 10 concepts in Stable Diffusion v1.4 (visualization pool; full evaluation pool in~\Cref{app:vocab}); each point is one prompt and ellipses show covariance contours. Semantically related concepts (\texttt{horse}/\texttt{pony}/\texttt{donkey}) cluster together, while isolated concepts (\texttt{castle}) are well-separated.
+\emph{Bottom-left:} Estimated entanglement coefficient $\hat\kappa$ (fraction of the target's activation region shared with semantic neighbors; see~\cref{def:overlap}). The Neighbors column lists representative discovered neighbors; full per-target neighbor sets are reported in~\cref{app:kappa_estimation}. Animal subtypes have high $\hat\kappa$ and dense neighbor sets; \texttt{castle} has low $\hat\kappa$ despite a comparable number of architectural neighbors.
+Ellipses are $(\mathbf z-\boldsymbol\mu_c)^\top\boldsymbol\Sigma_c^{-1}(\mathbf z-\boldsymbol\mu_c)\le 4$ for the mean and covariance of each concept's projected points; they are visualization aids only and are not used to compute $\hat\kappa$, which is estimated in the original activation space. The figure uses a ten-concept visualization pool; \texttt{castle}'s discovered neighbors (\texttt{citadel}, \texttt{fortress}, \texttt{keep}, \texttt{manor}, \texttt{palace}, \texttt{cathedral}) are shown in the inset.}
+% TODO(author): strengthen castle ellipse outline, add castle label, add inset with castle and its neighbors
 \label{fig:umap_kappa}
 % Aliases preserve existing \cref{fig:umap} and \cref{tab:kappa} references elsewhere in the paper; all three labels resolve to this combined float.
 \label{fig:umap}
@@ -56,7 +58,7 @@ castle & 0.27 & fortress, palace, citadel \\
 % \varun{earlier, you called this concept leakage; be consistent?}
 concept leakage and collateral forgetting, are dual symptoms of overlapping concept regions in cross-attention activation space (quantified by an entanglement coefficient $\hat\kappa$), rather than separate algorithmic shortcomings as treated in prior work~\citep{gandikota2023erasing,zhang2024defensive,srivatsan2025stereo,cywinski2025saeuron}. \textbf{(ii)} Building on this account,
 % we prove a method-agnostic lower bound
-we derive a geometric lower-bound for concept unlearning under empirically-verified assumptions: any method achieving $\varepsilon$-robust erasure must incur utility preservation error $\gamma \geq \kappa(1-\varepsilon)/L$ (\Cref{thm:tradeoff}), with strict impossibility at $\varepsilon = 0$ whenever $\kappa > 0$ (\Cref{cor:impossibility}); this result reframes unlearning as a Pareto problem rather than a dual-objective one. \textbf{(iii)} We validate the predicted $\kappa$-scaled trade-off across seven methods and five concepts spanning a wide range of $\hat\kappa$ values, using a new Neighbor Preservation metric tied to the activation-level $\gamma$ in our theorem.
+we derive a geometric lower-bound for concept unlearning under empirically-verified assumptions: any method achieving $\varepsilon$-robust erasure must incur utility preservation error $\gamma \geq \kappa(1-\varepsilon)/L$ (\Cref{thm:tradeoff}), with strict impossibility at $\varepsilon = 0$ whenever $\kappa > 0$ (\Cref{cor:impossibility}); this result reframes unlearning as a Pareto problem rather than a dual-objective one. \textbf{(iii)} We validate the predicted $\kappa$-scaled trade-off across thirteen methods on Stable Diffusion v1.4 (all methods on five targets, four methods on five additional targets that fill the intermediate $\hat\kappa$ range), with $\kappa$-scaling reproduced on SDXL, using a new Neighbor Preservation metric tied to the activation-level $\gamma$ in our theorem.
 
 % In this work, we argue that the UA/RA coupling observed above is not a shortcoming of individual unlearning algorithms but a structural consequence of how concepts are represented in diffusion models. 
 % Our approach proceeds in three steps.
