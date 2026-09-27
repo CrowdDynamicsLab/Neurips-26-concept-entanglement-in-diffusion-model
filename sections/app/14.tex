@@ -2,8 +2,21 @@
 
 \paragraph{SDXL.} SDXL shares the cross-attention structure of SD v1.4, so
 $\hat\kappa$ is directly computable. Table~\ref{tab:sdxl} reports ESD under the
-same erasure and evaluation protocol for three concepts.
-% TODO(author): SDXL cross-attention UMAP figure (referenced in the aFr7 response)
+same erasure and evaluation protocol for three concepts. \Cref{fig:umap_sdxl}
+shows that SDXL's cross-attention activations have the same qualitative
+geometry as SD v1.4 (\cref{fig:umap_kappa}): animal concepts occupy
+overlapping regions, while \texttt{castle} is well separated.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\linewidth]{img/umap_sdxl.pdf}
+\caption{UMAP projection of SDXL cross-attention activations for eight
+concepts, with covariance ellipses. As in SD v1.4 (\cref{fig:umap_kappa}),
+related animal concepts (\texttt{horse}/\texttt{pony}/\texttt{donkey},
+\texttt{dog}/\texttt{cat}) overlap, while \texttt{castle} forms an isolated
+cluster.}
+\label{fig:umap_sdxl}
+\end{figure}
 
 \begin{table}[h]\centering\small
 \caption{ESD on SDXL. NP decreases monotonically with $\hat\kappa_{\text{SDXL}}$.}
