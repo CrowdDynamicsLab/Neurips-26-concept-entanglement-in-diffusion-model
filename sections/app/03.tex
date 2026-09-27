@@ -83,7 +83,7 @@ This bimodal structure, high-$\hat\kappa$ animal subtypes clustered in $[0.77, 0
 We apply the procedure of~\cref{app:kappa_estimation} to the five target concepts used throughout~\cref{sec:experiment}. The shared candidate pool $\mathcal{C}_{\mathrm{pool}}$ consists of concepts spanning all five target domains and an out-of-domain control set: the five targets themselves; their respective fine-grained subtype candidates (equine, feline, canid, ursine, architectural); and ten generic out-of-domain controls (\texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyfish}, \texttt{lighthouse}, \texttt{melon}, \texttt{police car}, \texttt{teapot}, \texttt{violin}, \texttt{volcano}). 
 \Cref{tab:kappa_per_target} reports the resulting $\hat\kappa$ values together with the size of each discovered neighborhood $|\mathcal{N}(c_u)|$ (\cref{def:semantic_neighborhood}), the per-target fattening radius $\rho_{c_u}$, and the discovered neighbors.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
@@ -114,14 +114,15 @@ The strongest individual neighbors (\texttt{mare}, \texttt{pony}) already cover 
 
 The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block.attentions.0}$. To assess whether the bimodal $\hat\kappa$ structure reported in~\cref{tab:kappa} is an artifact of this choice, we re-ran the estimator at four additional cross-attention layers spanning the U-Net depth, holding all other estimator hyperparameters (candidate pool $\mathcal{C}_{\text{pool}}$, $\delta$-threshold percentile, fattening radius rule, prompt templates, timestep $t^*=25$) fixed.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{lccccc|cc}
 \toprule
 \textbf{Layer} & \texttt{castle} & \texttt{cat} & \texttt{horse} & \texttt{bear} & \texttt{dog} & Spearman $\rho$ vs.\ mid & Animal std \\
 \midrule
+\texttt{down\_blocks.2.attentions.0} & 0.34 & 0.77 & 0.86 & 0.92 & 0.92 & $+0.90$ & 0.094 \\
 \texttt{down\_blocks.2.attentions.1} & 0.26 & 0.71 & 0.74 & 0.87 & 0.85 & $+0.90$ & 0.069 \\
 \textbf{\texttt{mid\_block.attentions.0}} & \textbf{0.27} & \textbf{0.77} & \textbf{0.81} & \textbf{0.82} & \textbf{0.89} & --- & \textbf{0.043} \\
 \texttt{up\_blocks.1.attentions.0} & 0.09 & 0.59 & 0.48 & 0.88 & 0.79 & $+0.80$ & 0.158 \\
@@ -129,7 +130,7 @@ The $\hat\kappa$ estimator fixes the probe layer at $\ell^* = \texttt{mid\_block
 \texttt{up\_blocks.2.attentions.0} & 0.00 & 0.78 & 0.63 & 0.89 & 0.88 & $+0.80$ & 0.105 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{$\hat\kappa$ across five candidate probe layers.} All four alternative layers produce a $\hat\kappa$ ranking strongly consistent with mid-block (Spearman $\rho \geq 0.80$). Mid-block additionally yields the tightest cluster of animal-subtype $\hat\kappa$ values (std $=0.043$, vs.\ $0.069$--$0.203$ elsewhere), making it the layer at which the ``animal-subtype shared-manifold'' structure is most coherently expressed.}
+\caption{\textbf{$\hat\kappa$ across six candidate probe layers.} All four alternative layers produce a $\hat\kappa$ ranking strongly consistent with mid-block (Spearman $\rho \geq 0.80$). Mid-block additionally yields the tightest cluster of animal-subtype $\hat\kappa$ values (std $=0.043$, vs.\ $0.069$--$0.203$ elsewhere), making it the layer at which the ``animal-subtype shared-manifold'' structure is most coherently expressed.}
 \label{tab:layer_sensitivity}
 \end{table}
 

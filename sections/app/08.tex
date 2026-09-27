@@ -4,16 +4,23 @@ Here we introduce the implementation of each unlearning method used in~\cref{sec
 \url{https://anonymous.4open.science/r/concept-entangle-0A9C}
 
 \subsection{Method-Specific Hyperparameters}
-We group the seven benchmarked methods into two mechanism 
-families. \emph{Fine-tuning methods} (ESD, SalUn, EDiff, 
-AdvUnlearn, STEREO) modify model weights through gradient 
-updates on an unlearning objective. \emph{Inference-time methods} (SEOT, SAeUron) intervene on activations or embeddings during generation without modifying base weights. AdvUnlearn and STEREO additionally incorporate adversarial training, explicitly targeting the aggressive-erasure end of the trade-off; their inclusion tests whether robustness gains incur measurable cost to neighbor preservation.
+We group the 13 benchmarked methods into three mechanism families.
+\emph{Closed-form editing methods} (UCE, RECE) modify model weights through analytic updates. 
+\emph{Fine-tuning methods} (ESD, SalUn, EDiff, CPE, TRUST, AdvUnlearn, STEREO) modify model weights through gradient-based optimization.
+\emph{Inference-time methods} (SEOT, SAeUron, SLD, SAFREE) intervene during generation without permanently modifying the base model. AdvUnlearn and STEREO additionally incorporate adversarial training, explicitly targeting the aggressive-erasure end of the trade-off; their inclusion tests whether robustness gains incur measurable cost to neighbor preservation.
 
-Unless otherwise noted, we use the hyperparameters specified in each method's original publication. Deviations from the published configurations, and all choices not fully specified by the original 
-papers, are documented per-method below.
+Unless otherwise noted, we use the hyperparameters specified in each method's original publication. We document deviations and choices not fully specified by the original papers in the per-method descriptions below.
+
+\paragraph{UCE~\citep{gandikota2024unified}.}
+Unified Concept Editing uses closed-form updates to text-to-image attention projections to erase target concepts without gradient training. Configuration: guide concept \textbf{unconditional}, erase scale \textbf{1.0}, preserve scale \textbf{1.0}, regularization $\lambda$ \textbf{0.5}, no explicit preserve concepts; each concept is erased independently.
+
+\paragraph{RECE~\citep{gong2024reliable}.}
+Reliable and Efficient Concept Erasure iteratively discovers embeddings that recover the target concept and removes their effect through closed-form cross-attention edits.
+Configuration: initialized from base SD v1.4, edit epochs \textbf{1}, erase scale \textbf{1.0}, preserve scale \textbf{0.1}, $\lambda$ \textbf{0.1}, adversarial-embedding regularization \textbf{0.1}, guide concept \textbf{unconditional}.
+
+
 \paragraph{ESD~\citep{gandikota2023erasing}.} 
-Erased Stable Diffusion fine-tunes the cross-attention 
-layers to suppress the target concept via a negative-guidance objective. We use the ESD-sd (stable-diffusion) variant. 
+Erased Stable Diffusion fine-tunes the cross-attention layers to suppress the target concept via a negative-guidance objective. We use the ESD-sd (stable-diffusion) variant. 
 Configuration: learning rate \textbf{5e-5}, training steps \textbf{200}, negative guidance scale $\eta = \textbf{5}$, 
 batch size \textbf{1}. Training uses the target concept name as the single forget prompt.
 
@@ -21,6 +28,14 @@ batch size \textbf{1}. Training uses the target concept name as the single forge
 Saliency-guided Unlearning identifies salient weights via gradient magnitudes and applies random labeling on the forget set to those weights only. We use saliency threshold sparsity \textbf{0.5}, forget-set size \textbf{800}, learning rate \textbf{1e-5}, and training epochs \textbf{5}. The retain set is drawn from \textbf{800}.
 \paragraph{EDiff~\citep{wu2024erasediff}.} 
 EraseDiff fine-tunes the UNet using a bi-level optimization that explicitly balances erasure and retention objectives. Configuration: learning rate \textbf{1e-5}, inner steps per outer update \textbf{2}, total outer iterations \textbf{300}.
+\paragraph{CPE~\citep{lee2025concept}}
+Concept Pinpoint Eraser trains nonlinear residual attention gates with an anchoring loss to suppress target concepts while preserving other concepts.
+Configuration: \textbf{5} stages of \textbf{450} iterations each (stage 1 uses $4\times$ the iterations and $10\times$ the learning rate), learning rate \textbf{3e-5}, gate rank \textbf{16}, erasure guidance \textbf{0.3}, PAL weight \textbf{1e5}, noise \textbf{1e-3}; adversarial learning with learning rate \textbf{1e-2}, \textbf{450} iterations, and \textbf{16} added prompts per stage.
+
+\paragraph{TRUST~\citep{kori2026selective}}
+TRUST dynamically identifies target-associated neurons and selectively fine-tunes them with Hessian-based regularization.
+Configuration: concept neurons are heads whose $|z\text{-score}| > $ \textbf{2.0} on the CLIP-loss attribution; learning rate \textbf{1e-4}, batch size \textbf{2}, \textbf{2} epochs of \textbf{60} steps (final checkpoint), \textbf{25} sampling steps for neuron localization.
+
 \paragraph{AdvUnlearn~\citep{zhang2024defensive}.} 
 Adversarial Unlearning augments the erasure objective with adversarial prompt generation to improve robustness against indirect concept recovery. We use adversarial prompt budget 30 per training step, adversarial learning rate \textbf{1e-3}, main-model learning rate \textbf{1e-5}, and training steps \textbf{1000}. The attack prompts are updated per training steps.
 \paragraph{STEREO~\citep{srivatsan2025stereo}.} 
@@ -31,6 +46,15 @@ Soft Embedding Optimization for Target-concept erasure modifies the text embeddi
 \paragraph{SAeUron~\citep{cywinski2025saeuron}.} 
 SAeUron uses sparse autoencoder feature ablation applied at inference: for each target, $\tau_c$ concept-specific SAE features are identified from activation statistics, and these features are zeroed during generation. We use the pre-trained SAE released by the authors, with 
 $\tau_c = \textbf{1}$ features ablated per target. 
+
+
+\paragraph{SLD~\citep{schramowski2023safe}.}
+Safe Latent Diffusion adds safety guidance during denoising to suppress target content without retraining the model.
+Configuration: the \textbf{SLD-Max} preset, i.e.\ safety guidance scale \textbf{5000}, warm-up steps \textbf{0}, threshold \textbf{1.0}, momentum scale \textbf{0.5}, momentum $\beta$ \textbf{0.7}; \textbf{50} sampling steps, CFG scale \textbf{7.5}.
+
+\paragraph{SAFREE~\citep{yoon2025safree}.}
+SAFREE filters prompt embeddings away from a target-concept subspace and adapts its intervention during denoising without updating model weights.
+Configuration: concept subspace from \textbf{12} per-concept negative terms (synonyms, sub-breeds, and phrasings such as ``a photo of a dog''), $\alpha$ \textbf{-0.5}, re-attention up to step \textbf{20}, FreeU hyperparameters \textbf{(1.0, 1.0, 0.9, 0.2)}; \textbf{50} sampling steps, CFG scale \textbf{7.5}.
 
 
 \subsection{Compute and Infrastructure}

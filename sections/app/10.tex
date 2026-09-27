@@ -18,7 +18,7 @@ All tables follow the same column structure as \Cref{tab:main_results_avg}: eras
 \subsection{Dog}
 \label{app:per_concept_dog}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -54,7 +54,7 @@ SAeUron     & Inf.        & 78.0  & 18.5  & 8.76  & 4.27  & 73.0  & 68.72 \\
 \subsection{Bear}
 \label{app:per_concept_bear}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -86,7 +86,7 @@ SAeUron     & Inf.        & 85.5  & 15.0  & 22.37 & 63.50 & 93.8  & 30.30 \\
 \subsection{Horse}
 \label{app:per_concept_horse}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -119,7 +119,7 @@ SAeUron     & Inf.        & 78.0  & 39.5  & 76.92 & 82.48 & 94.0  & 11.51 \\
 \subsection{Cat}
 \label{app:per_concept_cat}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -131,7 +131,7 @@ SAeUron     & Inf.        & 78.0  & 39.5  & 76.92 & 82.48 & 94.0  & 11.51 \\
 \midrule
 Original    & --          & 0     & 96.0  & 85.50 & 100   & 100   & --    \\
 \midrule
-ESD         & FT          & 66.0  & 38.0  & 66.92 & 87.35 & 98.0  & 0.80  \\
+ESD         & FT          & 66.0  & 38.0  & 66.92 & 87.35 & 98.0  & 10.65  \\
 SalUn       & FT          & 87.0  & 21.0  & 34.53 & 73.04 & 100   & 26.95 \\
 EDiff       & FT          & 76.0  & 24.0  & 62.30 & 65.99 & 100   & 34.00 \\
 \midrule
@@ -151,7 +151,7 @@ SAeUron     & Inf.        & 72.0  & 37.5  & 60.25 & 85.63 & 96.0  & 10.37 \\
 \subsection{Castle}
 \label{app:per_concept_castle}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -165,7 +165,7 @@ Original    & --          & 0     & 9.5   & 53.84 & 100   & 100   & --    \\
 \midrule
 ESD         & FT          & 88.0  & 6.5   & 48.15 & 83.03 & 99.0  & 15.98 \\
 SalUn       & FT          & 97.0  & 1.0   & 54.76 & 67.58 & 94.0  & 26.41 \\
-EDiff       & FT          & 82.0  & 2.5   & 46.46 & 87.35 & 99.0  & 18.69 \\
+EDiff       & FT          & 82.0  & 2.5   & 46.46 & 87.35 & 99.0  & 11.65 \\
 \midrule
 AdvUnlearn  & Robust FT   & 100.0 & 1.0   & 44.00 & 83.10 & 100   & 16.89 \\
 STEREO      & Robust FT   & 100.0 & 0.0   & 29.38 & 31.96 & 96.0  & 64.03 \\
@@ -181,3 +181,54 @@ SAeUron     & Inf.        & --    & --    & --    & --    & --    & --    \\
 
 \paragraph{Observations.}
 \texttt{Castle} is the lowest-$\hat\kappa$ concept in our evaluation and demonstrates qualitatively different trade-off behavior from the high-$\hat\kappa$ animal concepts. Several methods achieve strong erasure with minimal retention damage: ESD reaches UA = $88$ at NP = $83.03$ (DamageGap = $15.98$), AdvUnlearn achieves complete erasure (UA = $100$) at NP = $83.10$ (DamageGap = $16.89$), and SEOT reaches UA = $98$ at NP = $98.21$ (DamageGap = $0.79$, the lowest of any (method, concept) pair in our evaluation). This is qualitatively distinct from the high-$\hat\kappa$ concepts, where no method achieves both UA $\geq 90$ and NP $\geq 80$. STEREO is the notable exception: despite the low predicted $\kappa$-floor, STEREO incurs NP = $31.96$ and DamageGap = $64.03$, comparable to its damage on the high-$\hat\kappa$ animal concepts. This is the empirical illustration of \Cref{thm:tradeoff} as a \emph{lower bound} rather than a ceiling: STEREO's REO objective broadly suppresses the spanned adversarial subspace regardless of whether neighbors actually occupy the displaced region (\Cref{rem:stereo}), producing damage well above the $\kappa$-predicted floor that other methods successfully hug. The separation between STEREO and the alternatives on \texttt{castle} suggests room for $\kappa$-aware unlearning methods that achieve robust erasure without STEREO's $\kappa$-blind over-suppression.
+
+\subsection{Additional Target Concepts}
+\label{app:additional_concepts}
+To extend the five-target analysis in the main text, we evaluate \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car}. Their estimated entanglement coefficients span $\hat\kappa \in [0.37, 0.83]$, adding concepts between the low-overlap \texttt{castle} and the densely overlapping animal subtypes. \Cref{tab:new_concept_results} reports the unedited reference and results for EDiff, ESD, SalUn, and STEREO using the metrics defined in~\cref{sec:experiment}.
+\begin{table*}[htbp]
+\centering
+\caption{Results for the five additional target concepts. Original denotes the pretrained model before unlearning. All evaluation metrics are percentages. Higher UA, IRA, NP, and CP are better; lower IRR and DamageGap are better. DamageGap is the difference between control preservation (CP) and neighbor preservation (NP).}
+\label{tab:new_concept_results}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llccccccc}
+\toprule
+Concept & Method & $\hat{\kappa}$ & UA (\%) $\uparrow$ & IRR (\%) $\downarrow$ & IRA (\%) $\uparrow$ & NP (\%) $\uparrow$ & CP (\%) $\uparrow$ & DamageGap (\%) $\downarrow$ \\
+\midrule
+Snake
+& Original  & 0.37 & 9.2 & 6.0 & 31.1 & 100.0 & 100.0 & 0.0 \\
+& EraseDiff & 0.37 & 88.1 & 8.6 & 19.1 & 81.2 & 93.6 & 12.4 \\
+& ESD       & 0.37 & 97.9 & 6.8 & 20.6 & 81.3 & 98.1 & 16.8 \\
+& SalUn     & 0.37 & 100.0 & 0.0 & 5.5 & 72.4 & 86.2 & 13.8 \\
+& STEREO    & 0.37 & 100.0 & 0.0 & 14.8 & 25.1 & 96.0 & 71.1 \\
+\midrule
+Fish
+& Original  & 0.52 & 6.2 & 11.0 & 40.5 & 100.0 & 100.0 & 0.0 \\
+& EraseDiff & 0.52 & 92.3 & 5.3 & 23.2 & 78.0 & 92.1 & 14.1 \\
+& ESD       & 0.52 & 94.5 & 2.7 & 34.5 & 79.2 & 98.0 & 18.8 \\
+& SalUn     & 0.52 & 100.0 & 0.0 & 14.9 & 67.5 & 97.8 & 30.3 \\
+& STEREO    & 0.52 & 100.0 & 0.0 & 5.8 & 23.2 & 38.4 & 15.2 \\
+\midrule
+Tree
+& Original  & 0.63 & 4.4 & 61.8 & 51.8 & 100.0 & 100.0 & 0.0 \\
+& EraseDiff & 0.63 & 32.0 & 55.2 & 53.8 & 75.1 & 98.0 & 22.9 \\
+& ESD       & 0.63 & 39.7 & 48.0 & 50.3 & 82.4 & 98.9 & 16.5 \\
+& SalUn     & 0.63 & 100.0 & 0.0 & 5.8 & 62.7 & 88.0 & 25.3 \\
+& STEREO    & 0.63 & 100.0 & 0.0 & 4.9 & 26.6 & 32.0 & 5.4 \\
+\midrule
+Butterfly
+& Original  & 0.66 & 7.1 & 12.2 & 36.0 & 100.0 & 100.0 & 0.0 \\
+& EraseDiff & 0.66 & 46.2 & 37.3 & 34.6 & 74.7 & 92.5 & 17.8 \\
+& ESD       & 0.66 & 72.6 & 28.9 & 31.2 & 78.1 & 83.3 & 5.2 \\
+& SalUn     & 0.66 & 100.0 & 0.0 & 0.9 & 73.1 & 93.9 & 20.8 \\
+& STEREO    & 0.66 & 100.0 & 0.0 & 10.5 & 19.2 & 68.0 & 48.8 \\
+\midrule
+Car
+& Original  & 0.83 & 2.6 & 60.0 & 87.5 & 100.0 & 100.0 & 0.0 \\
+& EraseDiff & 0.83 & 47.4 & 49.3 & 69.2 & 78.7 & 91.2 & 12.4 \\
+& ESD       & 0.83 & 60.5 & 28.6 & 75.8 & 73.8 & 98.6 & 24.8 \\
+& SalUn     & 0.83 & 79.3 & 16.1 & 17.8 & 66.8 & 85.6 & 18.8 \\
+& STEREO    & 0.83 & 99.1 & 4.3 & 21.1 & 16.0 & 75.2 & 59.1 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
