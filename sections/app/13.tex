@@ -18,12 +18,33 @@ $\hat\kappa=0.27$, $0.77$, $0.81$, $0.82$, $0.89$ in the SD v1.4 denoiser.
 \paragraph{CLIP text space versus denoiser within SDXL.} To compare the two
 spaces within one pipeline, we estimate $\hat\kappa$ for a ten-concept set
 spanning several semantic groups in SDXL's CLIP text-embedding space and in its
-denoiser cross-attention space. In CLIP space, nine of ten concepts obtain
+denoiser cross-attention space (\cref{tab:sdxl-text-vs-denoiser}). In CLIP space, nine of ten concepts obtain
 $\hat\kappa=1.0$ with semantically related neighborhoods; only \texttt{castle}
 obtains $0$. The denoiser produces heterogeneous values, including $0.72$ for
 \texttt{horse}, $0.68$ for \texttt{car}, and $0.60$ for \texttt{dog}, with the
-remaining concepts at $0$.
-% TODO(author): full per-concept table for the SDXL CLIP vs denoiser comparison
+remaining concepts at $0$. Neighbors here are discovered only within this
+ten-concept set, the visualization pool of~\cref{app:activation_regions},
+rather than from each target's full candidate pool, so these values are not
+comparable to $\hat\kappa_{\text{SDXL}}$ in~\cref{tab:sdxl}; they serve only to
+contrast the two representation spaces under identical conditions.
+
+\begin{table}[h]\centering\small
+\caption{$\hat\kappa$ for the ten-concept set in SDXL's CLIP text-embedding
+space and in its denoiser cross-attention space.}\label{tab:sdxl-text-vs-denoiser}
+\begin{tabular}{lcc}\toprule
+Concept & $\hat\kappa$ (CLIP text) & $\hat\kappa$ (denoiser)\\\midrule
+\texttt{horse}  & 1.00 & 0.72\\
+\texttt{pony}   & 1.00 & 0.00\\
+\texttt{donkey} & 1.00 & 0.00\\
+\texttt{deer}   & 1.00 & 0.00\\
+\texttt{dog}    & 1.00 & 0.60\\
+\texttt{cat}    & 1.00 & 0.00\\
+\texttt{bear}   & 1.00 & 0.00\\
+\texttt{car}    & 1.00 & 0.68\\
+\texttt{truck}  & 1.00 & 0.00\\
+\texttt{castle} & 0.00 & 0.00\\\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Interpretation.} Text-space geometry varies across encoders: CLIP
 shows substantial overlap under our estimator, whereas T5 shows none. Neither
