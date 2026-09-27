@@ -189,7 +189,26 @@ SAeUron     & Inf.        & --    & --    & --    & --    & --    & --    \\
 \label{app:additional_concepts}
 To extend the five-target analysis in the main text, we evaluate \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car}. Their estimated entanglement coefficients span $\hat\kappa \in [0.37, 0.83]$, adding concepts between the low-overlap \texttt{castle} and the densely overlapping animal subtypes. \Cref{tab:new_concept_results} reports the unedited reference and results for EDiff, ESD, SalUn, and STEREO using the metrics defined in~\cref{sec:experiment}.
 Averaged over the four methods, NP is $65.0$, $62.0$, $61.7$, $61.3$, and $58.8$ for \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car}, decreasing monotonically with $\hat\kappa$ ($\rs=-1.0$). Within-method correlations are $-0.4$ (EDiff), $-0.7$ (ESD), $-0.2$ (SalUn), and $-0.7$ (STEREO). STEREO again sits at the aggressive end, reaching UA $\geq 99.1$ on every new target with NP between $16.0$ and $26.6$.
-% TODO(author): discovered neighbor sets and classification vocabulary for the five new targets
+\Cref{tab:new_concept_neighbors} lists the neighbors discovered for each new target with the procedure of~\cref{app:kappa_estimation}.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccp{0.58\linewidth}}
+\toprule
+\textbf{Target} & $\hat\kappa$ & $|\mathcal{N}(c_u)|$ & \textbf{Discovered neighbors} \\
+\midrule
+\texttt{snake}     & 0.37 & 7 & anaconda, boa, cobra, garter snake, king snake, python, rattlesnake \\
+\texttt{fish}      & 0.52 & 8 & bass, cod, eel, herring, mackerel, salmon, trout, tuna \\
+\texttt{tree}      & 0.63 & 6 & cedar, cypress, maple, oak, pine, spruce \\
+\texttt{butterfly} & 0.66 & 7 & birdwing, dragonfly, fritillary, monarch butterfly, moth, red admiral, swallowtail \\
+\texttt{car}       & 0.83 & 7 & convertible, coupe, hatchback, minivan, sedan, suv, van \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Discovered neighbors for the five additional targets.} As for the original targets (\cref{tab:kappa_per_target}), neighborhood size does not determine $\hat\kappa$: \texttt{fish} has the most neighbors but an intermediate $\hat\kappa$.}
+\label{tab:new_concept_neighbors}
+\end{table}
 \begin{table*}[htbp]
 \centering
 \caption{Results for the five additional target concepts. Original denotes the pretrained model before unlearning. All evaluation metrics are percentages. Higher UA, IRA, NP, and CP are better; lower IRR and DamageGap are better. DamageGap is the difference between control preservation (CP) and neighbor preservation (NP).}
