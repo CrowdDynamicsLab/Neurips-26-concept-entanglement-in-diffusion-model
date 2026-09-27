@@ -12,6 +12,8 @@ SAeUron's released sparse autoencoder features cover the four animal concepts (\
 \paragraph{Reading the tables.}
 All tables follow the same column structure as \Cref{tab:main_results_avg}: erasure metrics (UA, IRR), retention metrics (IRA, NP, CP), and the composite DamageGap. The \emph{Original} row reports baseline rates for the unedited $\mathcal{D}_\theta$ on each concept's evaluation set; note that baseline IRA varies substantially across concepts (e.g., {0.85} for \texttt{cat} vs. {0.54} for \texttt{tower/castle}) due to differences in CLIP evaluator accuracy on each concept's in-domain object set. This per-concept baseline variation motivates our use of normalized retention ratios in~\cref{subsec:kappa_scaling}.
 
+\input{sections/app/pareto_per_concept}
+
 % ============================================================
 % Per-concept tables, ordered by descending kappa
 % ============================================================

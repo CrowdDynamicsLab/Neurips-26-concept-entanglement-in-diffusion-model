@@ -1,0 +1,48 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\linewidth, height=0.52\linewidth,
+  xmin=58, xmax=102, ymin=-3, ymax=103,
+  xlabel={UA (\%) $\uparrow$}, ylabel={NP (\%) $\uparrow$},
+  grid=major, grid style={line width=0.2pt, draw=black!10},
+  axis line style={draw=black!40}, tick style={draw=black!40},
+  legend style={at={(1.03,0.5)}, anchor=west, font=\footnotesize, draw=none, fill=none, row sep=1pt},
+  legend cell align=left,
+  mark size=2.6pt,
+]
+% Strong-erasure and strong-preservation region (UA > 90, NP > 80)
+\fill[black!6] (axis cs:90,80) rectangle (axis cs:102,103);
+\draw[black!45, dashed, line width=0.6pt] (axis cs:90,-3) -- (axis cs:90,103);
+\draw[black!45, dashed, line width=0.6pt] (axis cs:58,80) -- (axis cs:102,80);
+% Legend: method family (color), then concept (marker)
+\addlegendimage{only marks, mark=*, famFT}\addlegendentry{Fine-tuning}
+\addlegendimage{only marks, mark=*, famRob}\addlegendentry{Robust FT}
+\addlegendimage{only marks, mark=*, famInf}\addlegendentry{Inference-time}
+\addlegendimage{empty legend}\addlegendentry{}
+\addlegendimage{only marks, mark=*, black!55}\addlegendentry{\texttt{dog}}
+\addlegendimage{only marks, mark=triangle*, mark size=3.2pt, black!55}\addlegendentry{\texttt{bear}}
+\addlegendimage{only marks, mark=diamond*, mark size=3.2pt, black!55}\addlegendentry{\texttt{horse}}
+\addlegendimage{only marks, mark=square*, black!55}\addlegendentry{\texttt{cat}}
+\addlegendimage{only marks, mark=star, mark size=3.4pt, line width=1pt, black!55}\addlegendentry{\texttt{castle}}
+% Data: (UA, NP) per method-concept pair, Appendix~J tables
+\addplot[only marks, mark=*, mark size=2.8pt, draw=white, line width=0.4pt, fill=famFT, forget plot] coordinates {(75,93.51) (90,58.01) (62,80.29)};
+\addplot[only marks, mark=triangle*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famFT, forget plot] coordinates {(94.5,58.02) (99.5,53.89) (96,56.75)};
+\addplot[only marks, mark=diamond*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famFT, forget plot] coordinates {(80,81.12) (95,39.42) (81,76.48)};
+\addplot[only marks, mark=square*, mark size=2.6pt, draw=white, line width=0.4pt, fill=famFT, forget plot] coordinates {(66,87.35) (87,73.04) (76,65.99)};
+\addplot[only marks, mark=star, mark size=4.2pt, draw=famFT, line width=1.1pt, forget plot] coordinates {(88,83.03) (97,67.58) (82,87.35)};
+\addplot[only marks, mark=*, mark size=2.8pt, draw=white, line width=0.4pt, fill=famRob, forget plot] coordinates {(96,63.05) (100,1.81)};
+\addplot[only marks, mark=triangle*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famRob, forget plot] coordinates {(99,67.37) (99.5,13.75)};
+\addplot[only marks, mark=diamond*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famRob, forget plot] coordinates {(97.5,71.42) (100,14.71)};
+\addplot[only marks, mark=square*, mark size=2.6pt, draw=white, line width=0.4pt, fill=famRob, forget plot] coordinates {(100,72.40) (93,27.60)};
+\addplot[only marks, mark=star, mark size=4.2pt, draw=famRob, line width=1.1pt, forget plot] coordinates {(100,83.10) (100,31.96)};
+\addplot[only marks, mark=*, mark size=2.8pt, draw=white, line width=0.4pt, fill=famInf, forget plot] coordinates {(68,84.20) (78,4.27)};
+\addplot[only marks, mark=triangle*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famInf, forget plot] coordinates {(94,64.14) (85.5,63.50)};
+\addplot[only marks, mark=diamond*, mark size=3.4pt, draw=white, line width=0.4pt, fill=famInf, forget plot] coordinates {(81.5,97.06) (78,82.48)};
+\addplot[only marks, mark=square*, mark size=2.6pt, draw=white, line width=0.4pt, fill=famInf, forget plot] coordinates {(71.66,81.99) (72,85.63)};
+\addplot[only marks, mark=star, mark size=4.2pt, draw=famInf, line width=1.1pt, forget plot] coordinates {(98,98.21)};
+\end{axis}
+\end{tikzpicture}
+\caption{\textbf{Per-concept operating points of the seven original methods.} Each point is one (method, concept) pair from~\cref{app:per_concept_tables}; color encodes method family and marker encodes the target concept. The shaded region marks strong erasure together with strong neighbor preservation (UA $>90$, NP $>80$). No point for the four high-$\hat\kappa$ animal targets enters it; the only points that do are \texttt{castle} ($\hat\kappa=0.27$) under SEOT and AdvUnlearn, consistent with the $\kappa$-scaled bound of~\cref{thm:tradeoff}. SAeUron has no \texttt{castle} point (\cref{app:per_concept_castle}).}
+\label{fig:pareto_per_concept}
+\end{figure}
