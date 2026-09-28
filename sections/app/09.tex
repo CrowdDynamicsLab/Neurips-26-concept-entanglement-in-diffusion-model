@@ -27,8 +27,7 @@ We use the correlated context set for $c$ to construct a set of indirect prompts
 
 \paragraph{Semantic neighbors and control concepts.}
 The semantic neighborhood $\mathcal{N}(c)$ is determined by the procedure of Definition~\ref{def:semantic_neighborhood}: $\mathcal{N}(c)$ collects the candidates in $c$'s own pool whose centroid cosine distance to $c$ falls below the 25th percentile $\delta_c$ of pairwise distances in that pool. This produces concept-specific neighborhoods of five to seven discovered neighbors per target (\cref{tab:kappa_per_target}).
-The control set $\mathcal{C}(c) = \{\texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyfish}, \texttt{lighthouse}, \texttt{melon}, \texttt{police car},$
-$\texttt{teapot}, \texttt{violin}, \texttt{volcano}\}$ is identical across all five targets and consists of concepts whose centroids lie well above $\delta_c$ for every target, verified to contribute zero to $\hat\kappa$ across all five targets. For each neighbor $c' \in \mathcal{N}(c)$ and control $\tilde c \in \mathcal{C}(c)$, we generate prompts that explicitly mention the concept while excluding lexical forms of the target $c$. Per-target prompt files are released in the supplementary material.
+The control set $\mathcal{C}(c)$ of each target consists of three control concepts drawn from \{\texttt{cactus}, \texttt{jellyfish}, \texttt{melon}, \texttt{police car}\}, with \texttt{umbrella} in place of \texttt{police car} when the target is \texttt{car}; these are concepts whose centroids lie well above $\delta_c$ for every target, verified to contribute zero to $\hat\kappa$ across all five targets. For each neighbor $c' \in \mathcal{N}(c)$ and control $\tilde c \in \mathcal{C}(c)$, we generate prompts that explicitly mention the concept while excluding lexical forms of the target $c$. Per-target prompt files are released in the supplementary material.
 
 \paragraph{Classifier-based scoring.}
 All images are classified using a CLIP-based classifier over a fixed vocabulary of 65 concept labels (\cref{app:vocab}). For each image, the classifier returns the top-1 label among the vocabulary. All metrics defined below are computed from these top-1 assignments. In several random instances, we also perform a manual evaluation to ensure consistency of the results.
@@ -93,7 +92,7 @@ We measure retention at three levels of granularity:
 
 \subsection{Classification Vocabulary}
 \label{app:vocab}
-All CLIP-based classification uses the following 65-concept vocabulary, which is the union of the five targets, their candidate neighbors, and the shared controls used for $\hat\kappa$ estimation (\cref{app:kappa_estimation}). The same vocabulary is used for every metric and every one of these five targets, ensuring cross-target comparability. For the five additional targets of~\cref{app:additional_concepts}, the vocabulary is extended with each new target and its candidate neighbors (\cref{tab:new_concept_neighbors}).
+All CLIP-based classification uses the following 65-concept vocabulary, which is the union of the five targets, their candidate neighbors, and ten out-of-domain control labels, which include the controls used for $\hat\kappa$ estimation (\cref{app:kappa_estimation}). The same vocabulary is used for every metric and every one of these five targets, ensuring cross-target comparability. For the five additional targets of~\cref{app:additional_concepts}, the vocabulary is extended with each new target and its candidate neighbors (\cref{tab:new_concept_neighbors}).
 
 \begin{table}[h]
 \centering

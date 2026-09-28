@@ -80,7 +80,7 @@ SEOT        & Inf.        & 94.0  & 13.5  & 50.84 & 64.14 & 96.48 & 32.34 \\
 SAeUron     & Inf.        & 85.5  & 15.0  & 22.37 & 63.50 & 93.8  & 30.30 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Per-concept evaluation for \texttt{bear} ($\hat\kappa = 0.82$).} Discovered neighbors include \texttt{grizzly}, \texttt{panda}, \texttt{polar bear}, \texttt{koala}, and \texttt{cub} (full list in~\Cref{app:eval_pipeline}).}
+\caption{\textbf{Per-concept evaluation for \texttt{bear} ($\hat\kappa = 0.82$).} Discovered neighbors include \texttt{grizzly}, \texttt{panda}, \texttt{polar bear}, \texttt{koala}, and \texttt{cub} (full list in~\Cref{app:eval_pipeline}). Image counts differ for two runs: SalUn uses 272 neighbor images and SEOT uses 462 neighbor images.}
 \label{tab:per_concept_bear}
 \end{table}
 
@@ -113,7 +113,7 @@ SAeUron     & Inf.        & 78.0  & 39.5  & 76.92 & 82.48 & 94.0  & 11.51 \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Per-concept evaluation for \texttt{horse} ($\hat\kappa = 0.81$).} Discovered neighbors include 
-\texttt{pony}, \texttt{mare}, \texttt{donkey}, \texttt{zebra}, \texttt{stallion}, \texttt{foal} and \texttt{mule} (full list in~\Cref{app:eval_pipeline}).}
+\texttt{pony}, \texttt{mare}, \texttt{donkey}, \texttt{zebra}, \texttt{stallion}, \texttt{foal} and \texttt{mule} (full list in~\Cref{app:eval_pipeline}). Image counts differ for two runs: \emph{Original} uses approximately 480 neighbor and control images, and SEOT uses 58 direct images.}
 \label{tab:per_concept_horse}
 \end{table}
 
@@ -145,7 +145,7 @@ SEOT        & Inf.        & 71.66 & 34.0  & 42.15 & 81.99 & 100   & 18.01 \\
 SAeUron     & Inf.        & 72.0  & 37.5  & 60.25 & 85.63 & 96.0  & 10.37 \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Per-concept evaluation for \texttt{cat} ($\hat\kappa = 0.77$).} Discovered neighbors include \texttt{kitten}, \texttt{lynx}, \texttt{leopard}, \texttt{tiger}, and \texttt{cheetah} (full list in~\Cref{app:eval_pipeline}). The original baseline IRA = $85.50$ reflects high CLIP-evaluator accuracy on cat's in-domain object set after correcting for kitten/cat label confusion (see~\Cref{app:evaluation_setup}).}
+\caption{\textbf{Per-concept evaluation for \texttt{cat} ($\hat\kappa = 0.77$).} Discovered neighbors include \texttt{kitten}, \texttt{lynx}, \texttt{leopard}, \texttt{tiger}, and \texttt{cheetah} (full list in~\Cref{app:eval_pipeline}). The original baseline IRA = $85.50$ reflects high CLIP-evaluator accuracy on cat's in-domain object set after correcting for kitten/cat label confusion (see~\Cref{app:evaluation_setup}). Image counts differ for two runs: \emph{Original} uses approximately 480 neighbor and control images, and SEOT uses 72 direct images.}
 \label{tab:per_concept_cat}
 \end{table}
 
@@ -178,7 +178,7 @@ SAeUron     & Inf.        & --    & --    & --    & --    & --    & --    \\
 \bottomrule
 \end{tabular}
 \caption{\textbf{Per-concept evaluation for \texttt{castle} ($\hat\kappa = 0.27$).} Discovered neighbors include 
-\texttt{fortress}, \texttt{palace}, \texttt{citadel}, \texttt{keep}, \texttt{cathedral} and \texttt{manor} (full list in~\Cref{app:eval_pipeline}). SAeUron's released sparse autoencoder features do not cover \texttt{castle}; we attempted to substitute its \texttt{architectures} feature, but the resulting ablation did not yield meaningful suppression of castle generation.}
+\texttt{fortress}, \texttt{palace}, \texttt{citadel}, \texttt{keep}, \texttt{cathedral} and \texttt{manor} (full list in~\Cref{app:eval_pipeline}). SAeUron's released sparse autoencoder features do not cover \texttt{castle}; we attempted to substitute its \texttt{architectures} feature, but the resulting ablation did not yield meaningful suppression of castle generation. Image counts differ for two runs: \emph{Original} uses approximately 480 neighbor and control images, and SEOT uses 60 direct and 100 indirect images.}
 \label{tab:per_concept_castle}
 \end{table}
 

@@ -20,10 +20,10 @@ We restrict the overlap measurement in~\cref{def:overlap} to a finite set of can
 
 \begin{definition}[Semantic neighborhood]
 \label{def:semantic_neighborhood}
-For each target $c_u$, let $\mathcal{C}_{c_u}=\{c_u\}\cup\mathcal{C}^{\text{cand}}_{c_u}\cup\mathcal{C}^{\text{ctrl}}$
+For each target $c_u$, let $\mathcal{C}_{c_u}=\{c_u\}\cup\mathcal{C}^{\text{cand}}_{c_u}\cup\mathcal{C}^{\text{ctrl}}_{c_u}$
 be a target-specific pool, where $\mathcal{C}^{\text{cand}}_{c_u}$ contains ten
-semantically plausible candidate neighbors of $c_u$ and $\mathcal{C}^{\text{ctrl}}$
-is a set of unrelated control concepts shared across all targets. For each
+semantically plausible candidate neighbors of $c_u$ and $\mathcal{C}^{\text{ctrl}}_{c_u}$
+contains three unrelated control concepts. For each
 $c\in\mathcal{C}_{c_u}$, let $\bar{\mathbf{a}}_c=\frac{1}{|\mathcal{S}_c|}\sum_{\mathbf{a}\in\mathcal{S}_c}\mathbf{a}$ be the
 centroid of its activation samples. Let $\delta_{c_u}$ be the 25th percentile of
 all pairwise centroid cosine distances within $\mathcal{C}_{c_u}$. The semantic
@@ -35,7 +35,6 @@ d_{\cos}(\bar{\mathbf{a}}_{c_u},\bar{\mathbf{a}}_c)<\delta_{c_u}\bigr\},
 and every control is required to fall outside $\mathcal{N}(c_u)$.
 \end{definition}
 We emphasize that $\delta_{c_u}$ and $\mathcal{N}(c_u)$ are \emph{estimation-side} constructs: they appear only in the empirical estimator $\hat\kappa$ below and play no role in the theoretical bound of~\cref{thm:tradeoff}, which is stated entirely in terms of $\kappa(c_u, \rho)$. Because $\mathcal{N}(c_u) \subseteq \mathcal{C} \setminus \{c_u\}$, restricting the overlap computation to $\mathcal{N}(c_u)$ yields a lower bound on the true $\kappa$. The discovered neighborhoods are reported in~\cref{tab:kappa_per_target}.
-% TODO(author): confirm how many controls enter each target's pool (Section 4.1 says three; Appendix C.1 and I.1 list ten shared controls). If three of the ten are used for discovery and all ten for CP, state that in one sentence here.
 
 
 % We define the semantic neighborhood $\mathcal{N}(c)$ using centroid cosine distance. For each pair of concepts $(c_i, c_j)$, we compute the cosine distance between their mean activation vectors $\bar{\mathbf{a}}_{c_i}, \bar{\mathbf{a}}_{c_j}$. We set the neighborhood threshold $\delta$ to the 25th percentile of all pairwise centroid distances: concepts with centroid distance below $\delta$ are considered neighbors. The discovered neighborhoods are reported in~\cref{tab:kappa}.
@@ -90,7 +89,7 @@ This bimodal structure, high-$\hat\kappa$ animal subtypes clustered in $[0.77, 0
 
 \subsection{Per-Target Results}
 \label{app:kappa_per_target}
-We apply the procedure of~\cref{app:kappa_estimation} to the five target concepts used throughout~\cref{sec:experiment}. Each target's pool consists of the target, its ten fine-grained candidate neighbors (equine, feline, canid, ursine, or architectural; Table~\ref{tab:vocab}), and the shared out-of-domain controls (\texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyfish}, \texttt{lighthouse}, \texttt{melon}, \texttt{police car}, \texttt{teapot}, \texttt{violin}, \texttt{volcano}). 
+We apply the procedure of~\cref{app:kappa_estimation} to the five target concepts used throughout~\cref{sec:experiment}. Each target's pool consists of the target, its ten fine-grained candidate neighbors (equine, feline, canid, ursine, or architectural; Table~\ref{tab:vocab}), and three control concepts drawn from \{\texttt{cactus}, \texttt{jellyfish}, \texttt{melon}, \texttt{police car}\}, with \texttt{umbrella} in place of \texttt{police car} when the target is \texttt{car}. 
 \Cref{tab:kappa_per_target} reports the resulting $\hat\kappa$ values together with the size of each discovered neighborhood $|\mathcal{N}(c_u)|$ (\cref{def:semantic_neighborhood}), the per-target fattening radius $\rho_{c_u}$, and the discovered neighbors.
 
 \begin{table}[ht]
