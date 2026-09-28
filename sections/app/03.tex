@@ -87,6 +87,13 @@ This bimodal structure, high-$\hat\kappa$ animal subtypes clustered in $[0.77, 0
 % \paragraph{Robustness to metric and estimator choice.}
 % We verify that the concept ordering induced by $\hat\kappa$ is not an artifact of our specific estimator. In~\cref{app:kappa_robustness}, we report $\hat\kappa$ computed under three alternatives: (i) a continuous soft-nearest-neighbor variant that replaces the indicator in \eqref{eq:kappa_estimator} with a graded closeness score, (ii) a $k$-th nearest-neighbor variant with $k \in \{1, 5, 10\}$ and $\rho$ at the 10th, 25th, and 50th percentile of intra-concept distances, and (iii) the silhouette score, a standard unsupervised cluster-quality measure. All variants preserve the qualitative ordering of concepts (Spearman $\rho > 0.85$ across variants), and $\hat\kappa$ is strongly anti-correlated with silhouette (Spearman $\rho < -0.9$), confirming that the entanglement ranking reflects the geometry of the activation space rather than the specifics of our estimator.
 
+\noindent{\bf $\hat\kappa$ measures activation-space overlap, not semantic similarity.}
+A natural concern is whether $\hat\kappa$ proxies for some other concept-level property such as semantic category (animal vs.\ architecture). Our estimator (\Cref{app:kappa_estimation}) is computed from sample-level overlap of activation regions, not from category labels or human-judged similarity. \texttt{Castle} ($\hat\kappa = 0.27$) and the four animal concepts ($\hat\kappa \in [0.77, 0.89]$) differ in $\hat\kappa$ not because they belong to different taxonomic categories but because castle's discovered neighbors 
+% (\texttt{fortress}, \texttt{palace}, \texttt{citadel}) 
+occupy sub-regions of activation space despite being semantically related, while animal subtypes 
+% (e.g., \texttt{puppy}, \texttt{labrador} for \texttt{dog}; \texttt{mare}, \texttt{pony} for \texttt{horse}) 
+densely overlap their target's region.
+
 \subsection{Per-Target Results}
 \label{app:kappa_per_target}
 We apply the procedure of~\cref{app:kappa_estimation} to the five target concepts used throughout~\cref{sec:experiment}. Each target's pool consists of the target, its ten fine-grained candidate neighbors (equine, feline, canid, ursine, or architectural; Table~\ref{tab:vocab}), and three control concepts drawn from \{\texttt{cactus}, \texttt{jellyfish}, \texttt{melon}, \texttt{police car}\}, with \texttt{umbrella} in place of \texttt{police car} when the target is \texttt{car}. 
