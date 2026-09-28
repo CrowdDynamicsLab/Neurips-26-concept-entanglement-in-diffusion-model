@@ -26,9 +26,9 @@ PCA projection of pooled prompts used for the \texttt{horse} case study. One gro
 We use the correlated context set for $c$ to construct a set of indirect prompts $\mathcal{P}_{\mathrm{ind}}(c)$. These prompts are generated under an explicit lexical exclusion constraint: they must not contain the target token or excluded lexical variants of $c$. Intuitively, $\mathcal{P}_{\mathrm{ind}}(c)$ probes whether the erased concept can still be elicited through contextual associations alone, without direct lexical mention. To improve prompt diversity while preserving control, we generate multiple prompts from different subsets of the correlated context words and retain only prompts that satisfy the exclusion rule.
 
 \paragraph{Semantic neighbors and control concepts.}
-The semantic neighborhood $\mathcal{N}(c)$ is determined by the universal-pool $\delta$-threshold procedure given in~\cref{def:semantic_neighborhood}: $\mathcal{N}(c)$ collects all candidates in the shared pool $\mathcal{C}_{\mathrm{pool}}$ whose centroid cosine distance to $c$ falls below the global 25th-percentile threshold $\delta$. This produces concept-specific neighborhoods of five to seven discovered neighbors per target (\cref{tab:kappa_per_target}).
+The semantic neighborhood $\mathcal{N}(c)$ is determined by the procedure of Definition~\ref{def:semantic_neighborhood}: $\mathcal{N}(c)$ collects the candidates in $c$'s own pool whose centroid cosine distance to $c$ falls below the 25th percentile $\delta_c$ of pairwise distances in that pool. This produces concept-specific neighborhoods of five to seven discovered neighbors per target (\cref{tab:kappa_per_target}).
 The control set $\mathcal{C}(c) = \{\texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyfish}, \texttt{lighthouse}, \texttt{melon}, \texttt{police car},$
-$\texttt{teapot}, \texttt{violin}, \texttt{volcano}\}$ is identical across all five targets and consists of concepts whose centroids lie well above $\delta$ for every target, verified to contribute zero to $\hat\kappa$ across all five targets. For each neighbor $c' \in \mathcal{N}(c)$ and control $\tilde c \in \mathcal{C}(c)$, we generate prompts that explicitly mention the concept while excluding lexical forms of the target $c$. Per-target prompt files are released in the supplementary material.
+$\texttt{teapot}, \texttt{violin}, \texttt{volcano}\}$ is identical across all five targets and consists of concepts whose centroids lie well above $\delta_c$ for every target, verified to contribute zero to $\hat\kappa$ across all five targets. For each neighbor $c' \in \mathcal{N}(c)$ and control $\tilde c \in \mathcal{C}(c)$, we generate prompts that explicitly mention the concept while excluding lexical forms of the target $c$. Per-target prompt files are released in the supplementary material.
 
 \paragraph{Classifier-based scoring.}
 All images are classified using a CLIP-based classifier over a fixed vocabulary of 65 concept labels (\cref{app:vocab}). For each image, the classifier returns the top-1 label among the vocabulary. All metrics defined below are computed from these top-1 assignments. In several random instances, we also perform a manual evaluation to ensure consistency of the results.
@@ -63,7 +63,7 @@ These metrics measure how effectively the target concept $c$ is suppressed in th
 \paragraph{Retention metrics (measuring $\gamma$).}
 We measure retention at three levels of granularity:
 \begin{itemize}
-    \item \emph{In-domain Retain Accuracy (IRA)}: The fraction of images generated from indirect prompts by $\mathcal{D}_{\hat\theta}$ that are classified as a non-target, non-neighbor, non-control concept in the vocabulary. This captures the tendency of an unlearned model to substitute unrelated concepts when indirectly prompted for the erased target.
+    \item \emph{In-domain Retain Accuracy (IRA)}: The fraction of images whose intended concept is not the target, i.e., all images from neighbor and control prompts, that are classified as the concept they were meant to show. Direct and indirect recovery prompts are excluded because their intended label is the target itself. IRA therefore measures how well the unlearned model still renders every non-target concept it is asked for, without normalizing by the base model.
     %\ali{are we using this metric only for the UnlearnCanvas dataset? if not, this part is confusing and not needed.
     \item \emph{Neighbor Preservation (NP)}: This is our primary trade-off metric. The overlap with remaining concepts is often dominated by the overlap with a few concepts which are mostly semantically similar with the target concept. Therefore, as a proxy metric for utility preservation, we evaluate utility preservation in the semantic neighborhood $\mathcal{N}(c)$ of the target concept (\cref{def:semantic_neighborhood}) and define
     \begin{equation}
@@ -93,8 +93,7 @@ We measure retention at three levels of granularity:
 
 \subsection{Classification Vocabulary}
 \label{app:vocab}
-All CLIP-based classification uses the following 65-concept vocabulary, which is identical to the universal candidate pool $\mathcal{C}_{\mathrm{pool}}$ used for $\hat\kappa$ estimation (\cref{app:kappa_estimation}).
-The same vocabulary is used for every metric and every target, ensuring cross-target comparability.
+All CLIP-based classification uses the following 65-concept vocabulary, which is the union of the five targets, their candidate neighbors, and the shared controls used for $\hat\kappa$ estimation (\cref{app:kappa_estimation}). The same vocabulary is used for every metric and every one of these five targets, ensuring cross-target comparability. For the five additional targets of~\cref{app:additional_concepts}, the vocabulary is extended with each new target and its candidate neighbors (\cref{tab:new_concept_neighbors}).
 
 \begin{table}[h]
 \centering
@@ -112,19 +111,20 @@ Architectural  & \texttt{fortress}, \texttt{tower}, \texttt{cathedral}, \texttt{
 Controls  & \texttt{airplane}, \texttt{bicycle}, \texttt{cactus}, \texttt{jellyfish}, \texttt{lighthouse}, \texttt{melon}, \texttt{police car}, \texttt{teapot}, \texttt{violin}, \texttt{volcano} \\
 \bottomrule
 \end{tabular}
-\caption{The $65$-concept classification vocabulary used for all CLIP-based metric evaluations in~\cref{sec:experiment}. The vocabulary is the union of the five targets, their respective fine-grained subtype candidates spanning four animal category and one architectural category, and ten out-of-domain controls. See~\cref{tab:kappa_per_target} for the per-target subset $\mathcal{N}(c) \subseteq \mathcal{C}_{\mathrm{pool}}$ that survives the $\delta$-filter and forms the averaging set for NP.}
+\caption{The $65$-concept classification vocabulary used for all CLIP-based metric evaluations in~\cref{sec:experiment}. The vocabulary is the union of the five targets, their respective fine-grained subtype candidates spanning four animal category and one architectural category, and ten out-of-domain controls. See~\cref{tab:kappa_per_target} for the per-target subset $\mathcal{N}(c)$ that survives the $\delta_{c}$-filter and forms the averaging set for NP.}
 \label{tab:vocab}
 \end{table}
 
 \subsection{Classifier reliability}\label{app:classifier}
 We evaluate the fixed CLIP classifier on 100 labeled images per target (500 in
-total) and report per-concept true-positive and false-positive rates
+total), drawn from the base model's generations, and report per-concept true-positive and false-positive rates
 (Table~\ref{tab:clf}). Scoring is one-vs-rest among the five targets: for each
 target, its 100 images are the positives and the 400 images of the other four
 targets are the negatives, so TPR is out of 100 and FPR is out of 400. The classifier attains a micro-averaged TPR of $97.0\%$
 and FPR of $0.55\%$, ranging from $90\%$ TPR for \texttt{dog} to $1.25\%$ FPR
 for \texttt{horse}. All methods share the same classifier, vocabulary, prompts,
 and decision rule, so classifier error does not differ across methods.
+% TODO(author): state how ground-truth labels were assigned (e.g., manual verification).
 
 \begin{table}[h]\centering\small
 \caption{CLIP classifier reliability on labeled images.}\label{tab:clf}
