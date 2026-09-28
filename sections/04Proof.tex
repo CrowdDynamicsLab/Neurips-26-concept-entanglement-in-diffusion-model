@@ -88,7 +88,7 @@ The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\varepsilon$-robust unlearnin
 % where $\mathbb{O}_{\mathcal{X}} : \mathcal{X} \times \mathcal{C} \to \{0,1\}$ is the oracle concept detector \varun{already defined above; so maybe remove here?}. 
 % The worst-case quantifier reflects an adversarial threat model (see~\cref{subsec:setup}) \ali{again the section reference is too general. use the specific subsections when possible}.  % we additionally report the corresponding average-case quantity UA.
 \end{definition}
-\noindent{\bf Intuition.} Definition~\ref{def:robust} considers an unlearned model $\varepsilon$-robust if no prompt generates the erased concept with probability greater than $\varepsilon$. See~\cref{app:concept_regions} for more details on the oracle.
+See~\cref{app:concept_regions} for more details on the oracle.
 
 \begin{definition}[$\gamma$-concept preservation]
 \label{def:neighbor}
@@ -107,7 +107,6 @@ The CEM $\mathcal{D}_{\hat\theta}$ achieves \emph{$\gamma$-concept preservation}
 % \end{equation}
 \end{definition}
 
-\noindent{\bf Intuition.} An unlearned model has $\gamma$-concept preservation at a specific layer if, on average over prompts from all non-target concepts, the displacement of their representations at that layer remains smaller than $\gamma$.
 
 
 

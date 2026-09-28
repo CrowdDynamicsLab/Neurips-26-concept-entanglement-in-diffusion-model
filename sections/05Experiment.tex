@@ -11,7 +11,6 @@ We design our experiments to answer three questions, each tied to a component of
     % \ali{i think another important question that we investigate is whether the assumptions that we make for our theoretical results hold.}
     \item[\textbf{Q3.}] Do the Lipschitz continuity (\cref{asm:lip}) and minimum displacement (\cref{asm:edit}) assumptions underlying~\cref{thm:tradeoff} hold empirically? (\cref{app:lipschitz,app:displacement})
 \end{squishenumerate}
-\noindent \textbf{Summary of findings.} Across thirteen unlearning methods and target concepts spanning $\hat\kappa\in[0.27,0.89]$, no method simultaneously achieves strong erasure (UA $>90\%$) and strong neighbor preservation (NP $>80\%$) on average; methods occupy distinct regions of a Pareto frontier consistent with~\Cref{thm:tradeoff}, and preservation-oriented methods improve the operating point without escaping it (Q1). Trade-off severity scales with $\hat\kappa$: at near-matched erasure, STEREO's NP decreases monotonically ($\rs=-1.0$) and its directly measured neighbor displacement increases ($\rs=0.90$); the direction persists on five additional targets and on SDXL (Q2). The Lipschitz and minimum-displacement assumptions hold empirically on the prompt distributions and methods we evaluate (Q3).
 
 
 \subsection{Experimental Setup}
@@ -146,41 +145,20 @@ The DamageGap column spans more than 40 points across methods (from UCE at $10.7
 \Cref{thm:tradeoff} predicts that trade-off severity scales with the entanglement coefficient $\kappa$: target concepts whose activation regions overlap substantially with other concepts should suffer greater collateral damage under robust erasure. We test this across five target concepts with estimated $\hat\kappa$ span from $0.27$ (\texttt{castle}) to $0.89$ (\texttt{dog}); see~\cref{tab:kappa} and~\cref{app:kappa_estimation} for the estimation procedure. 
 
 
-\noindent{\bf $\hat\kappa$ predicts collateral damage on neighbors.}
-\Cref{fig:kappa_np_scaling} plots NP against $\hat\kappa$ for the available method-concept pairs among the seven original methods, and the table on the right reports STEREO's NP and in-domain retention ratio ordered by ascending $\hat\kappa$.
-Both decrease monotonically as $\hat\kappa$ increases, consistent with the linear $\kappa$-dependence in Eq.~\eqref{eq:tradeoff}. \Cref{fig:kappa_np_scaling} reveals three patterns: robust fine-tuning methods (red squares) exhibit the steepest $\hat\kappa$-dependence, with STEREO tracking $\hat\kappa$ monotonically and AdvUnlearn similarly decreasing; inference-time methods (green triangles) show only weak $\hat\kappa$-dependence because their effective displacement $\Delta$ is too small for the $\kappa$-scaling to dominate; standard fine-tuning methods (blue circles) occupy the middle band. This stratification reflects a structural principle: $\hat\kappa$ governs the lower bound on collateral damage, while the method's effective $\Delta$ determines how close it operates to that bound.
-\begin{figure}[t]
+\begin{wrapfigure}{r}{0.48\textwidth}
 \centering
-\begin{minipage}[c]{0.45\linewidth}
-\centering
-\includegraphics[width=\linewidth]
-{img/kappa_np_scaling_dashed.pdf}
-% {img/kappa_np_scaling.pdf}
-\end{minipage}\hfill
-\begin{minipage}[c]{0.45\linewidth}
-\centering
-\scriptsize
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Concept} & $\hat\kappa$ & NP$\uparrow$ & IRA-ratio$\uparrow$ \\
-\midrule
-\texttt{castle} & 0.27 & 31.96 & 0.55 \\
-\texttt{cat}    & 0.77 & 27.60 & 0.32 \\
-\texttt{horse}  & 0.81 & 14.71 & 0.29 \\
-\texttt{bear}   & 0.82 & 13.75 & 0.25 \\
-\texttt{dog}    & 0.89 & \phantom{0}1.81 & 0.06 \\
-\midrule
-\multicolumn{2}{l}{$\rs$} & $-1.0$ & $-1.0$ \\
-\bottomrule
-\end{tabular}
-\end{minipage}
-\caption{\textbf{Neighbor preservation scales inversely with $\hat\kappa$.} \emph{Left:} NP for each (method, concept) pair among the seven original methods; dashed lines connect each method's points in order of $\hat\kappa$ and serve as visual guides, not fitted trends. \emph{Right:} STEREO's NP and in-domain retention ratio across the five concepts ($\rs=-1.0$ for both).}
-% \caption{\textbf{Neighbor preservation scales inversely with $\hat\kappa$.} \emph{Left:} NP for each (method, concept) pair for seven methods; STEREO's trend line (dashed) tracks $\hat\kappa$ monotonically. \emph{Right:} STEREO's NP and in-domain retention ratio across the five concepts (Spearman $\rho = -1.0$ for both).}
+\vspace{-4mm}
+\includegraphics[width=\linewidth]{img/kappa_np_scaling_dashed.pdf}
+\caption{\textbf{Neighbor preservation scales inversely with $\hat\kappa$.} NP for
+each (method, concept) pair among the seven original methods; dashed lines
+connect each method's points in order of $\hat\kappa$ and are visual guides, not
+fitted trends. STEREO's NP decreases monotonically ($\rs=-1.0$).}
 \label{fig:kappa_np_scaling}
 \label{tab:kappa_scaling}
-\vspace{-2mm}
-\end{figure}
+\vspace{-3mm}
+\end{wrapfigure}
+\noindent{\bf $\hat\kappa$ predicts collateral damage on neighbors.}
+\Cref{fig:kappa_np_scaling} plots NP against $\hat\kappa$ for the available method-concept pairs among the seven original methods, and STEREO's NP decreases monotonically as $\hat\kappa$ increases (from $31.96$ on \texttt{castle} to $1.81$ on \texttt{dog}; Tables~\ref{tab:per_concept_dog} to~\ref{tab:per_concept_castle} in Appendix~\ref{app:per_concept_tables}), consistent with the linear $\kappa$-dependence in Eq.~\eqref{eq:tradeoff}. \Cref{fig:kappa_np_scaling} reveals three patterns: robust fine-tuning methods (red squares) exhibit the steepest $\hat\kappa$-dependence, with STEREO tracking $\hat\kappa$ monotonically and AdvUnlearn similarly decreasing; inference-time methods (green triangles) show only weak $\hat\kappa$-dependence because their effective displacement $\Delta$ is too small for the $\kappa$-scaling to dominate; standard fine-tuning methods (blue circles) occupy the middle band. This stratification reflects a structural principle: $\hat\kappa$ governs the lower bound on collateral damage, while the method's effective $\Delta$ determines how close it operates to that bound.
 
 % \Cref{tab:kappa_scaling} reports STEREO's neighbor preservation (NP) and in-domain retention ratio, ordered by ascending $\hat\kappa$. Both decrease monotonically as $\hat\kappa$ increases: STEREO's NP drops from $31.96$ on \texttt{castle} to $1.81$ on \texttt{dog}, while its IRA-retention ratio drops from $59\%$ to $6\%$. The Spearman rank correlation with $\hat\kappa$ is $\rho = -1.0$ for both metrics across the five concepts, consistent with Eq.~\eqref{eq:tradeoff}.
 % \begin{table}[t]
@@ -205,7 +183,7 @@ Both decrease monotonically as $\hat\kappa$ increases, consistent with the linea
 % \end{table}
 \paragraph{Direct test of Eq.~\eqref{eq:tradeoff}.} Eq.~\eqref{eq:tradeoff} predicts that, at matched erasure strength, a larger $\kappa$ forces a larger collateral displacement $\gamma$. STEREO provides this controlled comparison: it reaches UA $=100$ on four of five targets and $93.0$ on \texttt{cat}. Measured directly in activation space (Appendix~\ref{app:displacement_kappa}, Table~\ref{tab:displacement}), its mean neighbor displacement rises from $75.9$ on \texttt{castle} ($\hat\kappa=0.27$) to $234.2$, $233.4$, $240.9$, and $257.0$ on \texttt{cat}, \texttt{horse}, \texttt{bear}, and \texttt{dog} ($\rs=0.90$). All five fine-tuning methods show a positive correlation, four of them at $\rs\geq0.70$, and ESD is strictly monotone ($\rs=1.00$). Inverting Eq.~\eqref{eq:tradeoff} at each STEREO operating point yields $L_{\text{tight}}\in[0.0032,0.0035]$ across concepts, a $7.8\%$ spread, consistent with a single local Lipschitz constant for a method operating near the bound. Table~\ref{tab:main_results_avg} therefore establishes the trade-off, while this analysis tests the $\kappa$-dependence of the bound in the units in which it is stated; NP serves as a probability-level proxy for $\gamma$.
 
-\paragraph{Denser coverage of $\hat\kappa$.} To test whether the trend depends on \texttt{castle} alone or on an animal versus architecture split, we add \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car} ($\hat\kappa=0.37$, $0.52$, $0.63$, $0.66$, $0.83$) and evaluate EDiff, ESD, SalUn, and STEREO (Appendix~\ref{app:additional_concepts}). Method-averaged NP decreases monotonically with $\hat\kappa$, from $65.0$ to $58.8$ ($\rs=-1.0$), and every within-method correlation is negative (EDiff $-0.4$, ESD $-0.7$, SalUn $-0.2$, STEREO $-0.7$). With five additional targets these correlations are descriptive, not individually significant; they show that the direction of the effect persists across animal, plant, and vehicle concepts, including a low-$\hat\kappa$ animal and a high-$\hat\kappa$ vehicle.
+\paragraph{Denser coverage of $\hat\kappa$.} To test whether the trend depends on \texttt{castle} alone or on an animal versus architecture split, we add \texttt{snake}, \texttt{fish}, \texttt{tree}, \texttt{butterfly}, and \texttt{car} ($\hat\kappa=0.37$, $0.52$, $0.63$, $0.66$, $0.83$) and evaluate EDiff, ESD, SalUn, and STEREO (Appendix~\ref{app:additional_concepts}). Method-averaged NP decreases monotonically with $\hat\kappa$, from $65.0$ to $58.8$ ($\rs=-1.0$), and every within-method correlation is negative (EDiff $-0.4$, ESD $-0.7$, SalUn $-0.2$, STEREO $-0.7$). With five additional targets these correlations are descriptive, not individually significant; they show that the direction of the effect persists across animal, plant, and vehicle concepts, including a low-$\hat\kappa$ animal and a high-$\hat\kappa$ vehicle. The $\hat\kappa$ ordering is stable across probe layers ($\rs\geq0.80$) and denoising timesteps ($\rs=0.93$ and $0.96$ at steps 10 and 40 relative to step 25), although absolute values vary (Appendix~\ref{app:layer_sensitivity}). A discussion of why $\hat\kappa$ reflects activation overlap rather than semantic category is in Appendix~\ref{app:kappa_estimation}.
 
 \paragraph{Beyond Stable Diffusion v1.4.} On SDXL, whose cross-attention layers admit $\hat\kappa$, ESD's neighbor preservation decreases monotonically with entanglement: NP $=90.9$, $85.0$, and $77.1$ for \texttt{cat}, \texttt{castle}, and \texttt{dog} ($\hat\kappa_{\text{SDXL}}=0.65$, $0.72$, $0.92$; $\rs=-1.0$ over three concepts). The most entangled target is also the least erased (UA $=77$ for \texttt{dog} versus $99$ for \texttt{cat}), so the ordering is not driven by erasure strength. Absolute $\hat\kappa$ shifts across architectures (\texttt{castle} is $0.27$ on SD v1.4 and $0.72$ on SDXL), but $\hat\kappa$ and observed damage agree within each architecture. On the MMDiT model FLUX, joint text-image attention leaves no cross-attention block analogous to our probe, and a proxy estimator saturates near $1$ even for unrelated control pairs, so $\kappa$-scaling on MMDiT remains untested. The phenomenon itself recurs: ESD on FLUX reduces NP to $35.6$ to $40.5$ on \texttt{dog}, \texttt{cat}, and \texttt{castle} while preserving unrelated controls (CP $=95.3$ to $98.9$), i.e., neighbor-selective rather than global degradation (Appendix~\ref{app:arch}).
 % \begin{figure}[t]
@@ -228,13 +206,7 @@ Both decrease monotonically as $\hat\kappa$ increases, consistent with the linea
 % \end{minipage}
 % \end{figure}
 
-\noindent{\bf $\hat\kappa$ measures activation-space overlap, not semantic similarity.}
-A natural concern is whether $\hat\kappa$ proxies for some other concept-level property such as semantic category (animal vs.\ architecture). Our estimator (\Cref{app:kappa_estimation}) is computed from sample-level overlap of activation regions, not from category labels or human-judged similarity. \texttt{Castle} ($\hat\kappa = 0.27$) and the four animal concepts ($\hat\kappa \in [0.77, 0.89]$) differ in $\hat\kappa$ not because they belong to different taxonomic categories but because castle's discovered neighbors 
-% (\texttt{fortress}, \texttt{palace}, \texttt{citadel}) 
-occupy sub-regions of activation space despite being semantically related, while animal subtypes 
-% (e.g., \texttt{puppy}, \texttt{labrador} for \texttt{dog}; \texttt{mare}, \texttt{pony} for \texttt{horse}) 
-densely overlap their target's region. 
-The $\hat\kappa$ ordering is stable across probe layers ($\rs\geq0.80$) and denoising timesteps ($\rs=0.93$ and $0.96$ at steps 10 and 40 relative to step 25), although absolute values vary (Appendix~\ref{app:layer_sensitivity}).
+
 % The category label is descriptive; $\hat\kappa$ is the operative quantity \Cref{thm:tradeoff} predicts on, and the same procedure that yields $\hat\kappa = 0.27$ for \texttt{castle} yields $\hat\kappa = 0.89$ for \texttt{dog}.
 
 % \noindent{\bf \Cref{thm:tradeoff} is a lower bound, not a ceiling.}
