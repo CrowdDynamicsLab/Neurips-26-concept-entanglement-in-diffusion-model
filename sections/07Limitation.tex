@@ -1,9 +1,6 @@
-\section{Limitations and Broader Impact}
+\section{Limitations}
 \label{sec:limitations}
 
 \paragraph{Scope of empirical evaluation.} All thirteen methods are evaluated on five targets on Stable Diffusion v1.4; five further targets are evaluated with four methods. Cross-architecture evidence is limited: SDXL covers three concepts with one method, and on FLUX we can show neighbor-selective damage but cannot resolve $\kappa$, so $\kappa$-scaling on MMDiT remains open. Our targets are object concepts; artistic styles, identities, and harmful-content concepts remain untested.
 
 \paragraph{Theory and $\hat\kappa$ estimation.} Theorem~\ref{thm:tradeoff} applies to any unlearning mechanism, but its constants are effective ones: $L$ captures the full network, including skip connections, and is estimated only for the prompt variations of Appendix~\ref{app:lipschitz}. $\hat\kappa$ is an empirical lower-bound proxy for $\kappa$ whose absolute value depends on the probe layer, the denoising timestep (e.g., $\hat\kappa(\texttt{castle})=0.77$ at step 10), and the candidate pool; our claims rely on its ranking, which is stable across the settings we test. The text-space comparison is not a causal decomposition of where entanglement arises.
-
-\noindent{\bf Broader Impacts.}
-Our analysis is instantiated in diffusion models, but the mechanism only requires activation displacement, local smoothness of the activation map, and target-neighbor overlap in representation space. Similar $\kappa$-scaled trade-offs may arise in autoregressive language models, classifiers, and multimodal models, but verifying this requires task-specific definitions of concepts, activations, and preservation.
