@@ -11,7 +11,6 @@ We design our experiments to answer three questions, each tied to a component of
     % \ali{i think another important question that we investigate is whether the assumptions that we make for our theoretical results hold.}
     \item[\textbf{Q3.}] Do the Lipschitz continuity (\cref{asm:lip}) and minimum displacement (\cref{asm:edit}) assumptions underlying~\cref{thm:tradeoff} hold empirically? (\cref{app:lipschitz,app:displacement})
 \end{squishenumerate}
-\noindent \textbf{Summary of findings.} Across thirteen unlearning methods and target concepts spanning $\hat\kappa\in[0.27,0.89]$, no method simultaneously achieves strong erasure (UA $>90\%$) and strong neighbor preservation (NP $>80\%$) on average; methods occupy distinct regions of a Pareto frontier consistent with~\Cref{thm:tradeoff}, and preservation-oriented methods improve the operating point without escaping it (Q1). Trade-off severity scales with $\hat\kappa$: at near-matched erasure, STEREO's NP decreases monotonically ($\rs=-1.0$) and its directly measured neighbor displacement increases ($\rs=0.90$); the direction persists on five additional targets and on SDXL (Q2). The Lipschitz and minimum-displacement assumptions hold empirically on the prompt distributions and methods we evaluate (Q3).
 
 
 \subsection{Experimental Setup}
