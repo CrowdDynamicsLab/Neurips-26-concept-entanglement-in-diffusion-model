@@ -66,7 +66,8 @@ Configuration: concept subspace from \textbf{12} per-concept negative terms (syn
 All experiments were run on GPU A100 40GB. Unlearning per method-target pair requires approximately 1 GPU-hours for fine-tuning methods and 2 GPU-hours for inference-time methods. Evaluation (image generation + classification) requires approximately 0.5 GPU-hours per method-target pair.
 
 \subsection{Reproducibility}
-For each (method, target) pair, we generate 100 images from direct prompts, 100 to 235 from indirect prompts, 50 per neighbor candidate (500 total), and 50 per control concept (150 total), using fixed random seeds, with seed equal to the row index in the target's prompt CSV. This ensures seed-level variation is controlled when comparing methods on the same prompt.
+\label{app:reproducibility}
+For each (method, target) pair, we generate 100 images from direct prompts, 100 to 235 from indirect prompts (depending on how many valid indirect prompts the target yields; 235 for \texttt{castle}, 200 for \texttt{dog}, 195 for \texttt{horse}, and 100 for every other target), 50 per neighbor candidate (500 total), and 50 per control concept (150 total); IRA is computed over the 650 neighbor and control images. All images use fixed random seeds, with seed equal to the row index in the target's prompt CSV. This ensures seed-level variation is controlled when comparing methods on the same prompt.
 The base model $\mathcal{D}_\theta$ is loaded from the HuggingFace checkpoint \texttt{CompVis/stable-diffusion-v1-4}. Code, prompt CSVs, and the classification vocabulary (\cref{tab:vocab}) will be released to enable full reproduction of~\cref{tab:main_results_avg}.
 
 \paragraph{Use of existing assets.}
