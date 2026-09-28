@@ -33,7 +33,6 @@ Methods that erase more aggressively (STEREO~\cite{srivatsan2025stereo}) suppres
 
 Table~\ref{tab:main_results_avg} quantifies this coupling. Averaged over five targets, STEREO achieves near-complete erasure (UA $=99.8$, IRR $=3.5$) but retains only NP $=18.0$ on semantic neighbors, whereas SEOT preserves neighbors (NP $=85.1$) but leaves an indirect recovery rate of $24.5$. The damage also tracks entanglement: STEREO's NP falls monotonically from $31.96$ on \texttt{castle} ($\hat\kappa=0.27$) to $1.81$ on \texttt{dog} ($\hat\kappa=0.89$; Section~\ref{subsec:kappa_scaling}).
 
-Together, these observations imply that modifying the activation region of a target concept necessarily affects other concepts that rely on the same shared representation. In other words, interventions intended to suppress a concept will propagate to concepts with which is it entangled, giving rise to both concept leakage and collateral damage. 
 %\varun{i would comment the rest of this text} In~\cref{sec:tradeoff} we formalize this constraint as a provable lower bound on the trade-off between erasure effectiveness and utility preservation. And in~\cref{sec:experiment}, we validate the trade-off quantitatively across seven unlearning methods.
 
 \begin{comment}
