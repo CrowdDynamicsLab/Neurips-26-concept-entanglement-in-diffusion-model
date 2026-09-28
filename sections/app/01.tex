@@ -1,40 +1,5 @@
 \section{Formal Definition of Concept Activation Regions}
 \label{app:concept_regions}
-\subsection{Background: latent diffusion models}\label{app:background}
-We briefly introduce the latent diffusion notation used throughout the paper, since our analysis of concept activation regions and unlearning-induced perturbations is defined over the model's latent, text-conditioned denoising process.
-
-\textbf{Text-to-image latent diffusion models.}
-We consider a text-to-image latent diffusion model (LDM) of the form introduced in Stable Diffusion~\citep{rombach2022high}.
-% We consider a text-to-image latent diffusion model (LDM), following Stable Diffusion~\citep{rombach2022high} \varun{what does it mean to follow?}. 
-An input image $\mathbf{x} \in \mathcal{X}$ is first mapped by a pretrained variational autoencoder encoder $E$ into a latent representation 
-% \varun{the latent z is bold-faced in the next line, not bold-faced here? subsequent usages are also mixed in usage} 
-$\mathbf{z} = E(x) \in \mathcal{Z}$, and reconstructed by a decoder $V : \mathcal{Z} \rightarrow \mathcal{X}$. 
-
-% \ali{I think this is extra info: 
-% Instead of modeling pixels directly, the diffusion model operates in latent space, which substantially reduces computation while preserving semantic content.}
-Given a latent $\mathbf{z}$, the forward diffusion process corrupts it with Gaussian noise to obtain $\mathbf{z}_t$ at timestep $t \in \{1,\dots,T\}$. 
-A time-conditioned U-Net $\boldsymbol{\epsilon}_\theta$ is then trained to predict the noise $\boldsymbol{\epsilon}$ 
-% \varun{i would change noise variable to $\eta$ to avoid confuson with the U-net} 
-% \yian{kept $\epsilon$/$\epsilon_\theta$ for noise/U-Net to match the standard DDPM convention used in every concept-erasure baseline we compare against (ESD, STEREO, SAeUron, AdvUnlearn).}
-added to $\mathbf{z}_t$. 
-In text-conditioned generation, a prompt $p \in \mathcal{P}$ is encoded by a text encoder $f_{\psi}$ into text features $\mathbf{e}_p = f_{\psi}(p)$, and these features condition the U-Net through cross-attention layers. 
-The standard latent diffusion objective is
-\begin{equation}
-\label{eq:ldm_loss}
-\mathcal{L}_{\mathrm{LDM}}
-=
-\mathbb{E}_{x,\epsilon,t}
-\left[
-\left\|
-\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{z}_t, t, \mathbf{e}_p)
-\right\|_2^2
-\right],
-\end{equation}
-where $\epsilon \sim \mathcal{N}(0,I)$ 
-%\ali{this is redundant: and $z_t$ is the noisy latent corresponding to $z = E(x)$}.
-At inference time, generation starts from Gaussian noise and iteratively denoises toward a clean latent, which is finally decoded into an image.
-
-\subsection{Concept activation regions}
 This appendix provides the formal construction of the concept activation function $\boldsymbol{\Phi}_\theta$ and activation region $\mathcal{R}_c$ used throughout~\cref{sec:tradeoff}. The compressed version in the main text specifies these informally; the definition here is the formal object used in the proofs of~\cref{thm:tradeoff}.
 
 \begin{definition}[Concept activation function and region]
