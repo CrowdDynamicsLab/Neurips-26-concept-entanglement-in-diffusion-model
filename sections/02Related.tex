@@ -1,67 +1,10 @@
-\section{Background \& Related Work}
+\section{Related Work}
 \label{sec:background}
-This section introduces the background on text-to-image diffusion models and reviews existing approaches for concept unlearning in diffusion models.
 
-\subsection{Background}
-% \varun{what is the significance of the discussion around diffusion mdoels? why is this primer needed to understand the rest of your paper? need to give that context!}
-We briefly introduce the latent diffusion notation used throughout the paper, since our analysis of concept activation regions and unlearning-induced perturbations is defined over the model's latent, text-conditioned denoising process.
-
-\textbf{Text-to-image latent diffusion models.}
-We consider a text-to-image latent diffusion model (LDM) of the form introduced in Stable Diffusion~\citep{rombach2022high}.
-% We consider a text-to-image latent diffusion model (LDM), following Stable Diffusion~\citep{rombach2022high} \varun{what does it mean to follow?}. 
-An input image $\mathbf{x} \in \mathcal{X}$ is first mapped by a pretrained variational autoencoder encoder $E$ into a latent representation 
-% \varun{the latent z is bold-faced in the next line, not bold-faced here? subsequent usages are also mixed in usage} 
-$\mathbf{z} = E(x) \in \mathcal{Z}$, and reconstructed by a decoder $V : \mathcal{Z} \rightarrow \mathcal{X}$. 
-
-% \ali{I think this is extra info: 
-% Instead of modeling pixels directly, the diffusion model operates in latent space, which substantially reduces computation while preserving semantic content.}
-Given a latent $\mathbf{z}$, the forward diffusion process corrupts it with Gaussian noise to obtain $\mathbf{z}_t$ at timestep $t \in \{1,\dots,T\}$. 
-A time-conditioned U-Net $\boldsymbol{\epsilon}_\theta$ is then trained to predict the noise $\boldsymbol{\epsilon}$ 
-% \varun{i would change noise variable to $\eta$ to avoid confuson with the U-net} 
-% \yian{kept $\epsilon$/$\epsilon_\theta$ for noise/U-Net to match the standard DDPM convention used in every concept-erasure baseline we compare against (ESD, STEREO, SAeUron, AdvUnlearn).}
-added to $\mathbf{z}_t$. 
-In text-conditioned generation, a prompt $p \in \mathcal{P}$ is encoded by a text encoder $f_{\psi}$ into text features $\mathbf{e}_p = f_{\psi}(p)$, and these features condition the U-Net through cross-attention layers. 
-The standard latent diffusion objective is
-\begin{equation}
-\label{eq:ldm_loss}
-\mathcal{L}_{\mathrm{LDM}}
-=
-\mathbb{E}_{x,\epsilon,t}
-\left[
-\left\|
-\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{z}_t, t, \mathbf{e}_p)
-\right\|_2^2
-\right],
-\end{equation}
-where $\epsilon \sim \mathcal{N}(0,I)$ 
-%\ali{this is redundant: and $z_t$ is the noisy latent corresponding to $z = E(x)$}.
-At inference time, generation starts from Gaussian noise and iteratively denoises toward a clean latent, which is finally decoded into an image.
-
-% \ali{maybe "notation" in the name of this section is confusing because most of the notations and definitions will be in section 4.}
-
-% \textbf{Contrast with vision-language models.}
-% Although diffusion models use text encoders similar to those used in vision-language models (VLMs)~\citep{radford2021learning}, their training objectives differ fundamentally.
-% VLMs such as CLIP are typically trained on large collections of image--text pairs using contrastive objectives that align image and text embeddings by pulling matched pairs together and pushing mismatched pairs apart~\citep{radford2021learning,zhang2024vision}. 
-% Thus, VLM training primarily learns \emph{cross-modal alignment} in a shared representation space.
-% In contrast, diffusion models use text embeddings as conditioning signals for a denoising generator: the text encoder does not directly predict image-text similarity, but instead provides token-level features that guide image synthesis through cross-attention.
-% This distinction matters for unlearning: removing a concept from a generative diffusion model requires changing how text-conditioned denoising gives rise to visual content, not merely altering a retrieval-style similarity score.
-% \textbf{Contrast with vision-language models.}
-% \ali{I think this section is not necessary as we are not making any comparison or claim regarding the unlearning in VLMs.}
-% Both vision-language models (VLMs)~\citep{radford2021learning} and text-to-image diffusion models learn a mapping between textual inputs and visual content. In VLMs, this mapping is used to align images and captions in a shared embedding space, while in diffusion models, text embeddings condition the denoising process that generates images. Thus, in both settings, text representations are tied to visual semantics, but diffusion models use this mapping generatively rather than for retrieval or matching. This distinction is important for unlearning: removing a concept from a diffusion model requires changing how text-conditioned representations give rise to visual content.
-
-
-%\varun{i think the important part that is not highlighted is how there is text-image mapping in both models; the exact specifics of learning etc. are not relevant and can be removed/moved to appendix?}
-
-% \textbf{Diffusion unlearning.}
-% Let $\mathcal{D}_\theta$ denote a pretrained text-to-image diffusion model with parameters $\theta$, and let $c$ denote a target concept to be erased (e.g., \texttt{horse}).
-% Diffusion unlearning seeks to produce an updated model $\mathcal{D}_{\theta'}$ such that prompts referring to $c$ no longer generate images containing that concept, while the model retains its ability to generate unrelated content.
-% Formally, given a prompt distribution $\mathcal{P}_c$ associated with concept $c$, the goal is to reduce the probability that samples from $\mathcal{D}_{\theta'}(\cdot \mid p)$ contain $c$ for $p \sim \mathcal{P}_c$, while preserving generation quality and fidelity on prompts outside this target concept class. \varun{is there prior work on this? add some pointers, or maybe say this is discussed in intro? maybe this should be merged with the next subsection?}
-
-\subsection{Unlearning Methods}
-Machine unlearning in diffusion models aims to remove a target concept $c$ (e.g., \textit{horse}) from a pretrained model $\mathcal{D}_\theta$(the full text-to-image pipeline parameterized by the U-Net weights $\theta$ from Eq.~\ref{eq:ldm_loss}) 
+Machine unlearning in diffusion models aims to remove a target concept $c$ (e.g., \textit{horse}) from a pretrained model $\mathcal{D}_\theta$
 % \varun{use a different variable for params, as the params $\theta$ are used for the U-Net?} 
 % \yian{$\theta$ is shared with $\epsilon_\theta$ on purpose as the U-Net is the only trainable component, so $\mathcal{D}_\theta$ and $\epsilon_\theta$ must share parameters. }
-while preserving overall generative capabilities. The goal is an updated model $\mathcal{D}_{\hat{\theta}}$ that suppresses $c$ on target-associated prompts while maintaining quality on unrelated prompts, following prior work on concept erasure in diffusion models. 
+while preserving overall generative capabilities. The goal is an updated model $\mathcal{D}_{\hat{\theta}}$ that suppresses $c$ on target-associated prompts while maintaining quality on unrelated prompts, following prior work on concept erasure in diffusion models. Background on latent diffusion models is in Appendix~\ref{app:background}.
 
 \paragraph{Closed-form editing.} UCE~\citep{gandikota2024unified} and RECE~\citep{gong2024reliable} modify cross-attention projections through analytic updates, without gradient training. RECE additionally searches for embeddings that regenerate the target and removes them in closed form.
 
