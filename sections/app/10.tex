@@ -256,3 +256,18 @@ Car
 \end{tabular}
 }
 \end{table*}
+
+\subsection{Which targets admit clean erasure}\label{app:clean-erasure}
+Across the per-concept results we report (the seven original methods on the
+five main targets, \cref{tab:per_concept_dog,tab:per_concept_bear,tab:per_concept_horse,tab:per_concept_cat,tab:per_concept_castle}, and four methods on the five additional
+targets, \cref{tab:new_concept_results}), the only (method, concept) pairs that reach both
+UA $>90$ and NP $>80$ are on the two lowest-$\hat\kappa$ targets:
+\texttt{castle} ($\hat\kappa=0.27$; SEOT at $98.0/98.21$, AdvUnlearn at
+$100.0/83.10$) and \texttt{snake} ($\hat\kappa=0.37$; ESD at $97.9/81.3$).
+No method reaches this region on any target with $\hat\kappa\geq0.52$
+(\cref{fig:pareto_per_concept,tab:new_concept_results}). Because $\hat\kappa$ is computed from base-model activations alone,
+it identifies these targets before any unlearning is run, which is the sense in
+which we propose it as a pre-deployment diagnostic (\cref{sec:conclusion}). The damage is
+also neighbor-selective rather than global: control preservation stays above
+$85$ for twelve of the thirteen methods in \cref{tab:main_results_avg} (all except
+STEREO), while NP drops.
