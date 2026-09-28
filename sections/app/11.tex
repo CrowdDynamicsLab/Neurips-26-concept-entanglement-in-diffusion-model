@@ -34,7 +34,7 @@ SalUn      & \phantom{0}88.1 & 220.7 & 215.6 & 220.4 & 215.3 & $+0.10$ \\
 \Cref{thm:tradeoff} predicts that for a method operating exactly at the bound, the ratio $\kappa(1-\varepsilon)/(\Delta_{\text{neighbor}} + c_0)$ should equal a single Lipschitz constant $L$ across all concepts. We compute this ratio for each method using STEREO's saturated $\varepsilon \approx 0.035$ (mean IRR across the five concepts; see~\cref{tab:main_results_avg})  and an additive constant $c_0 = 0.05$.
  The resulting $L_{\text{tight}}$ values are reported in~\Cref{tab:l_tight}. STEREO's $L_{\text{tight}}$ varies by only $7.8\%$ across the five concepts ($L \in [0.0032, 0.0035]$); other methods exhibit spreads of $24\%$ to $57\%$. STEREO's single-$L$ consistency is precisely the quantitative prediction of \Cref{thm:tradeoff}: a method operating at the bound should exhibit a $\kappa$-and-concept-independent local Lipschitz constant. Among the five methods evaluated, only STEREO satisfies this prediction, consistent with STEREO occupying the high-$\Delta$, low-$\varepsilon$ regime where the bound is tightest.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
